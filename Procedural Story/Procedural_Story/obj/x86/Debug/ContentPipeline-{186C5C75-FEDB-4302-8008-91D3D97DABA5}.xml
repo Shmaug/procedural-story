@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>font\Consolas9.spritefont</Source>
+      <Name>font\Consolas9</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Consolas9.xnb</Output>
+      <Time>2016-03-16T23:24:07.8172909-07:00</Time>
+    </Item>
+    <Item>
+      <Source>font\Avenir36.spritefont</Source>
+      <Name>font\Avenir36</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Avenir36.xnb</Output>
+      <Time>2016-03-16T20:35:00.4771494-07:00</Time>
+    </Item>
+    <Item>
+      <Source>sprite\ui\cursor.png</Source>
+      <Name>sprite\ui\cursor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\cursor.xnb</Output>
+      <Time>2016-03-16T20:51:07.7523453-07:00</Time>
+    </Item>
+    <Item>
+      <Source>sprite\env\desert.png</Source>
+      <Name>sprite\env\desert</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\env\desert.xnb</Output>
+      <Time>2016-03-17T23:05:30.3300539-07:00</Time>
+    </Item>
+    <Item>
+      <Source>sprite\bomb.png</Source>
+      <Name>sprite\bomb</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\bomb.xnb</Output>
+      <Time>2016-03-16T22:15:55.7623398-07:00</Time>
+    </Item>
+    <Item>
+      <Source>sprite\char\player.png</Source>
+      <Name>sprite\char\player</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\char\player.xnb</Output>
+      <Time>2016-03-17T22:49:45.4366537-07:00</Time>
+    </Item>
+    <Item>
+      <Source>sprite\ui\icons.png</Source>
+      <Name>sprite\ui\icons</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\icons.xnb</Output>
+      <Time>2016-03-16T22:49:42.5113979-07:00</Time>
+    </Item>
+    <Item>
+      <Source>sprite\ui\hud.png</Source>
+      <Name>sprite\ui\hud</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\hud.xnb</Output>
+      <Time>2016-03-16T22:47:47.6660862-07:00</Time>
+    </Item>
+    <Item>
+      <Source>fx\world.fx</Source>
+      <Name>fx\world</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\fx\world.xnb</Output>
+      <Time>2016-03-17T16:46:32.910426-07:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <ContentProjectGUID>{186C5C75-FEDB-4302-8008-91D3D97DABA5}</ContentProjectGUID>
+      <TargetPlatform>Windows</TargetPlatform>
+      <TargetProfile>HiDef</TargetProfile>
+      <BuildConfiguration>Debug</BuildConfiguration>
+      <CompressContent>false</CompressContent>
+      <RootDirectory>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_StoryContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2011-09-01T16:22:30-07:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.VideoImporters.dll</Key>
+        <Value>2011-09-01T16:22:30-07:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2011-09-01T16:22:30-07:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2011-09-01T16:22:30-07:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2011-09-01T16:22:30-07:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.AudioImporters.dll</Key>
+        <Value>2011-09-01T16:22:30-07:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\WINDOWS\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2016-01-01T03:51:51.1828203-08:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>
