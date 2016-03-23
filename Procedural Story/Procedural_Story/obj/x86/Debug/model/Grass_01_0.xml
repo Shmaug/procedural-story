@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics" xmlns:Framework="Microsoft.Xna.Framework">
+  <Asset Type="Graphics:NodeContent">
+    <Name>Grass_01_root</Name>
+    <Identity>
+      <SourceFilename>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_StoryContent\model\Grass_01.fbx</SourceFilename>
+      <SourceTool>FbxImporter</SourceTool>
+    </Identity>
+    <Transform>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</Transform>
+    <Children>
+      <Child Type="Graphics:MeshContent">
+        <Name>Mesh1_Grass Model</Name>
+        <Transform>1 0 0 0 0 1 0 0 0 0 1 0 -0.36 0 0.36 1</Transform>
+        <Positions>0.3625 0.395 -0.3625 0 1.57918E-16 -0.3625 0.3625 1.12799E-16 -0.3625 0.725 1.57918E-16 -0.3625</Positions>
+        <Geometry>
+          <Batch>
+            <Material>#Resource1</Material>
+            <Indices>2 1 0 0 3 2 6 5 4 4 7 6</Indices>
+            <Vertices>
+              <PositionIndices>0 1 2 3 3 2 1 0</PositionIndices>
+              <Channels>
+                <VertexChannel Name="Normal0" ElementType="Framework:Vector3">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1</VertexChannel>
+                <VertexChannel Name="TextureCoordinate0" ElementType="Framework:Vector2">0.164773 0.820455 0 1 0.164773 1 0.329545 1 0.329545 1 0.164773 1 0 1 0.164773 0.820455</VertexChannel>
+                <VertexChannel Name="Color0" ElementType="Framework:Vector4">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</VertexChannel>
+              </Channels>
+            </Vertices>
+          </Batch>
+        </Geometry>
+      </Child>
+      <Child Type="Graphics:MeshContent">
+        <Name>Mesh2_Grass Model</Name>
+        <Transform>1 0 0 0 0 1 0 0 0 0 1 0 -0.36 0 0.36 1</Transform>
+        <Positions>0.3625 1.12799E-16 -0.3625 0.725 1.57918E-16 -0.3625 0.3625 0 -0.725 0.3625 0.1975 -0.3625 0.3625 1.35358E-16 0</Positions>
+        <Geometry>
+          <Batch>
+            <Material>#Resource2</Material>
+            <Indices>2 1 0 5 4 3 8 7 6 11 10 9</Indices>
+            <Vertices>
+              <PositionIndices>2 0 3 3 0 2 4 3 0 0 3 4</PositionIndices>
+              <Channels>
+                <VertexChannel Name="Normal0" ElementType="Framework:Vector3">-1 -1.82762E-15 4.07258E-13 -1 -1.82762E-15 4.07258E-13 -1 -1.82762E-15 4.07258E-13 1 1.82762E-15 -4.07258E-13 1 1.82762E-15 -4.07258E-13 1 1.82762E-15 -4.07258E-13 -1 -1.82762E-15 4.06262E-13 -1 -1.82762E-15 4.06262E-13 -1 -1.82762E-15 4.06262E-13 1 1.82762E-15 -4.06262E-13 1 1.82762E-15 -4.06262E-13 1 1.82762E-15 -4.06262E-13</VertexChannel>
+                <VertexChannel Name="TextureCoordinate0" ElementType="Framework:Vector2">-0.329545 1 -0.164773 1 -0.164773 0.9102273 -0.164773 0.9102273 -0.164773 1 -0.329545 1 6.69409E-14 1 -0.164773 0.9102273 -0.164773 1 -0.164773 1 -0.164773 0.9102273 6.69409E-14 1</VertexChannel>
+                <VertexChannel Name="Color0" ElementType="Framework:Vector4">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</VertexChannel>
+              </Channels>
+            </Vertices>
+          </Batch>
+        </Geometry>
+      </Child>
+    </Children>
+  </Asset>
+  <Resources>
+    <Resource ID="#Resource1" Type="Graphics:BasicMaterialContent">
+      <Name>Green_leafs</Name>
+      <Identity>
+        <SourceFilename>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_StoryContent\model\Grass_01.fbx</SourceFilename>
+        <SourceTool>FbxImporter</SourceTool>
+      </Identity>
+      <OpaqueData>
+        <Data Key="DiffuseColor" Type="Framework:Vector3">0.298039 0.529412 0.427451</Data>
+        <Data Key="EmissiveColor" Type="Framework:Vector3">0 0 0</Data>
+        <Data Key="Alpha" Type="float">1</Data>
+        <Data Key="SpecularColor" Type="Framework:Vector3">0.33 0.33 0.33</Data>
+        <Data Key="SpecularPower" Type="float">20</Data>
+      </OpaqueData>
+    </Resource>
+    <Resource ID="#Resource2" Type="Graphics:BasicMaterialContent">
+      <Name>Green_leafs</Name>
+      <Identity>
+        <SourceFilename>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_StoryContent\model\Grass_01.fbx</SourceFilename>
+        <SourceTool>FbxImporter</SourceTool>
+      </Identity>
+      <OpaqueData>
+        <Data Key="DiffuseColor" Type="Framework:Vector3">0.298039 0.529412 0.427451</Data>
+        <Data Key="EmissiveColor" Type="Framework:Vector3">0 0 0</Data>
+        <Data Key="Alpha" Type="float">1</Data>
+        <Data Key="SpecularColor" Type="Framework:Vector3">0.33 0.33 0.33</Data>
+        <Data Key="SpecularPower" Type="float">20</Data>
+      </OpaqueData>
+    </Resource>
+  </Resources>
+</XnaContent>

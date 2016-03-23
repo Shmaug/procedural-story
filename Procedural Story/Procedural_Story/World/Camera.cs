@@ -8,34 +8,36 @@ namespace Procedural_Story.World {
     class Camera {
         public static Camera CurrentCamera;
 
-        public Vector2 Position;
-        public float Scale;
+        public Vector3 Position;
+        public Vector3 Rotation;
+
+        public float AspectRatio;
+
+        public BoundingFrustum Frustum {
+            get {
+                return new BoundingFrustum(View * Projection);
+            }
+        }
+        public Matrix RotationMatrix {
+            get {
+                return Matrix.CreateRotationX(Rotation.X) * Matrix.CreateRotationY(Rotation.Y) * Matrix.CreateRotationZ(Rotation.Z);
+            }
+        }
+        public Matrix View {
+            get {
+                Matrix rot = RotationMatrix;
+                return Matrix.CreateLookAt(Position, Position + rot.Forward, rot.Up);
+            }
+        }
+        public Matrix Projection {
+            get {
+                return Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(70), AspectRatio, .1f, 1000);
+            }
+        }
 
         public Camera() {
-            Position = Vector2.Zero;
-            Scale = 1;
-        }
-
-        public Vector2 Project(Vector2 p) {
-            return Vector2.Transform(p, getMatrix());
-        }
-
-        public Vector2 Unproject(Vector2 p) {
-            return Vector2.Transform(p, getMatrixBackwards());
-        }
-
-        public Matrix getMatrix() {
-            return
-                Matrix.CreateTranslation(new Vector3(-Position, 0)) *
-                Matrix.CreateScale(Scale) *
-                Matrix.CreateTranslation(UI.UIElement.ScreenWidth * .5f, UI.UIElement.ScreenHeight * .5f, 0);
-        }
-
-        public Matrix getMatrixBackwards() {
-            return
-                Matrix.CreateTranslation(-UI.UIElement.ScreenWidth * .5f, -UI.UIElement.ScreenHeight * .5f, 0) *
-                Matrix.CreateScale(1f / Scale) *
-                Matrix.CreateTranslation(new Vector3(Position, 0));
+            Position = Vector3.Zero;
+            Rotation = Vector3.Zero;
         }
     }
 }

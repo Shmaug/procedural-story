@@ -4,7 +4,7 @@ using BenTools.Data;
 
 namespace BenTools.Mathematics
 {
-	public class VoronoiGraph
+    public class VoronoiGraph
 	{
 		public HashSet<Vector> Vertizes = new HashSet<Vector>();
 		public HashSet<VoronoiEdge> Edges = new HashSet<VoronoiEdge>();

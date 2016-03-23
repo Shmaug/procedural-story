@@ -11,6 +11,10 @@ using Microsoft.Xna.Framework.Media;
 
 using Procedural_Story.UI;
 using Procedural_Story.World;
+using Procedural_Story.Util;
+
+using Jitter;
+using Jitter.LinearMath;
 
 namespace Procedural_Story {
     class Input {
@@ -23,6 +27,55 @@ namespace Procedural_Story {
         InGame,
         Paused
     }
+
+    class JitterDrawer : IDebugDrawer {
+        GraphicsDevice device;
+        BasicEffect effect;
+
+        public JitterDrawer(GraphicsDevice dev) {
+            device = dev;
+            effect = new BasicEffect(device);
+            effect.LightingEnabled = false;
+        }
+
+        public void DrawLine(JVector start, JVector end) {
+            VertexPositionColor[] line = new VertexPositionColor[2] {
+                new VertexPositionColor(new Vector3(start.X, start.Y, start.Z), Color.White),
+                new VertexPositionColor(new Vector3(end.X, end.Y, end.Z), Color.White),
+            };
+
+            effect.World = Matrix.Identity;
+            effect.View = Camera.CurrentCamera.View;
+            effect.Projection = Camera.CurrentCamera.Projection;
+
+            foreach (EffectPass p in effect.CurrentTechnique.Passes) {
+                p.Apply();
+                device.DrawUserPrimitives(PrimitiveType.LineList, line, 0, 1);
+            }
+        }
+
+        public void DrawPoint(JVector pos) {
+
+        }
+
+        public void DrawTriangle(JVector pos1, JVector pos2, JVector pos3) {
+            VertexPositionColor[] tri = new VertexPositionColor[3] {
+                new VertexPositionColor(new Vector3(pos1.X, pos1.Y, pos1.Z), Color.Green),
+                new VertexPositionColor(new Vector3(pos2.X, pos2.Y, pos2.Z), Color.Green),
+                new VertexPositionColor(new Vector3(pos3.X, pos3.Y, pos3.Z), Color.Green),
+            };
+
+            effect.World = Matrix.Identity;
+            effect.View = Camera.CurrentCamera.View;
+            effect.Projection = Camera.CurrentCamera.Projection;
+
+            foreach (EffectPass p in effect.CurrentTechnique.Passes) {
+                p.Apply();
+                device.DrawUserPrimitives(PrimitiveType.TriangleList, tri, 0, 1);
+            }
+        }
+    }
+
     public class Main : Game {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -38,8 +91,8 @@ namespace Procedural_Story {
 
         #region content
         Texture2D CursorTexture;
-        Effect WorldEffect;
-        
+
+        RenderTarget2D DepthTarget;
         RenderTarget2D SceneTarget;
         #endregion
 
@@ -59,9 +112,10 @@ namespace Procedural_Story {
             Window.ClientSizeChanged += (object sender, EventArgs e) => {
                 graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
                 graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+                graphics.PreferMultiSampling = true;
                 graphics.ApplyChanges();
 
-                SceneTarget = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+                SceneTarget = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
             };
             
             form = (System.Windows.Forms.Form) System.Windows.Forms.Form.FromChildHandle(Window.Handle);
@@ -78,13 +132,10 @@ namespace Procedural_Story {
             UIElement.BlankTexture.SetData<Color>(new Color[] { Color.White });
 
             CursorTexture = Content.Load<Texture2D>("sprite/ui/cursor");
-            Player.HudTexture = Content.Load<Texture2D>("sprite/ui/hud");
-            Player.Texture = Content.Load<Texture2D>("sprite/char/player");
-            Tile.TileSets = new Texture2D[] { Content.Load<Texture2D>("sprite/env/desert") };
 
-            WorldEffect = Content.Load<Effect>("fx/world");
-            
-            SceneTarget = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            Models.Load(Content);
+
+            SceneTarget = new RenderTarget2D(GraphicsDevice, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
 
             #region font loading
             UIElement.Fonts = new Dictionary<string, SpriteFont>();
@@ -111,6 +162,8 @@ namespace Procedural_Story {
                 new ImageLabel(loadFrame, "bar", new UDim2(.5f, .5f, -100, -10), new UDim2(0, 0, 200, 20), UIElement.BlankTexture, Color.DarkSlateGray) // oh god what have i done
                 , "bar", new UDim2(0, 0, 1, 1), new UDim2(0, 1, -2, -2), UIElement.BlankTexture, Color.White);
             #endregion
+
+            DepthTarget = new RenderTarget2D(GraphicsDevice, 4096, 4096, false, SurfaceFormat.Single, DepthFormat.Depth24Stencil8);
         }
 
         protected override void UnloadContent() {
@@ -144,18 +197,23 @@ namespace Procedural_Story {
                     if (Area.LoadProgress >= 1) {
                         GameState = GameState.InGame;
                         MainFrame.Children["Load"].Visible = false;
+                        Player.Position = new Vector3(0, Area.CellAt(Player.Position).Elevation + Player.Height * .5f, 0);
                     }
                     MainFrame.Children["Load"].Children["bar"].Children["bar"].Size.Scale.X = Area.LoadProgress;
                     break;
                 case GameState.InGame:
-                    Player.Update(gameTime);
-                    Camera.CurrentCamera.Position = Player.Position + new Vector2(Player.HitBox.Width * .5f, Player.HitBox.Height * .5f);
+                    if (Input.ms.RightButton == ButtonState.Pressed)
+                        Camera.CurrentCamera.Rotation.Y -= (Input.ms.X - Input.lastms.X) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
+                    
+                    Area.Update(gameTime);
 
-                    if (Input.ms.ScrollWheelValue > Input.lastms.ScrollWheelValue)
-                        Camera.CurrentCamera.Scale *= 1.25f;
-                    else if (Input.ms.ScrollWheelValue < Input.lastms.ScrollWheelValue)
-                        Camera.CurrentCamera.Scale /= 1.25f;
-                    Camera.CurrentCamera.Scale = MathHelper.Clamp(Camera.CurrentCamera.Scale, .5f, 3f);
+                    if (Input.ms.RightButton == ButtonState.Pressed) {
+                        //Camera.CurrentCamera.Rotation.X -= (Input.ms.Y - Input.lastms.Y) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
+                        Camera.CurrentCamera.Rotation.Y -= (Input.ms.X - Input.lastms.X) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
+                    }
+                    Camera.CurrentCamera.Rotation.X = MathHelper.ToRadians(-25);
+                    Camera.CurrentCamera.Position = Player.Position + Vector3.Up * 2 + Camera.CurrentCamera.RotationMatrix.Backward * 10;
+
                     break;
             }
 
@@ -167,77 +225,71 @@ namespace Procedural_Story {
         protected override void Draw(GameTime gameTime) {
             fc++; ft += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (ft >= 1f) { fps = fc; fc = 1; ft = 0; }
-
+            
             GraphicsDevice.Clear(Color.Black);
-
+            
             // Draw game
             switch (GameState) {
                 case GameState.InGame:
-                    WorldEffect.Parameters["PixelSize"].SetValue(new Vector2(1f / GraphicsDevice.PresentationParameters.BackBufferWidth, 1f / GraphicsDevice.PresentationParameters.BackBufferHeight));
-                    WorldEffect.Parameters["CameraPosition"].SetValue(new Vector2(Camera.CurrentCamera.Position.X, Camera.CurrentCamera.Position.Y));
-                    WorldEffect.Parameters["Proj"].SetValue(Matrix.CreateOrthographicOffCenter(0, Window.ClientBounds.Width, Window.ClientBounds.Height, 0, 0, 1) * Matrix.CreateTranslation(-1f / Window.ClientBounds.Width, 1f / Window.ClientBounds.Height, 0));
+                    Camera.CurrentCamera.AspectRatio = (float)UIElement.ScreenWidth / UIElement.ScreenHeight;
                     
-                    GraphicsDevice.SetRenderTarget(SceneTarget);
-                    GraphicsDevice.Clear(Color.Black);
-
-                    spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Camera.CurrentCamera.getMatrix());
                     if (Input.ks.IsKeyDown(Keys.F))
-                        Area.DrawVoronoi(spriteBatch);
-                    else {
-                        Area.DrawBackground(spriteBatch);
-                        Area.DrawHulls(spriteBatch);
-                    }
-                    Player.Draw(spriteBatch);
-                    spriteBatch.End();
+                        GraphicsDevice.RasterizerState = new RasterizerState() { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.WireFrame };
+                    GraphicsDevice.BlendState = BlendState.Opaque;
+                    GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+
+                    // draw depth
+                    GraphicsDevice.SetRenderTarget(DepthTarget);
+                    GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+                    GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferFunction = CompareFunction.LessEqual };
+                    Models.SceneEffect.Parameters["DepthDraw"].SetValue(true);
+                    Area.Draw(GraphicsDevice, true);
                     
+                    // draw scene
+                    GraphicsDevice.SetRenderTarget(SceneTarget);
+                    GraphicsDevice.Clear(Color.SkyBlue);
+                    GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+                    Models.SceneEffect.Parameters["DepthDraw"].SetValue(false);
+                    Models.SceneEffect.Parameters["DepthTexture"].SetValue(DepthTarget);
+                    Models.SceneEffect.Parameters["DepthPixelSize"].SetValue(new Vector2(1f / DepthTarget.Width, 1f / DepthTarget.Height));
+                    Area.Draw(GraphicsDevice, false);
+
                     GraphicsDevice.SetRenderTarget(null);
                     GraphicsDevice.Clear(Color.Black);
                     
-                    Vector3[] lc = new Vector3[16];
-                    Vector3[] lp = new Vector3[16];
-                    lc[0] = new Vector3(1, 1, 1);
-                    lp[0] = new Vector3(Player.Center + new Vector2(Player.Direction == 2 ? -30 : (Player.Direction == 1 ? 30 : 0), Player.Direction == 0 ? 30 : (Player.Direction == 3 ? -30 : 0)), 150);
-                    int ln = 1;
-                    if (Area.visibleLights != null)
-                        for (int i = 0; i < Area.visibleLights.Length; i++)
-                            if (Area.visibleLights[i] != null) {
-                                lc[ln] = Area.visibleLights[i].Color.ToVector3();
-                                lp[ln] = new Vector3(Area.visibleLights[i].Position, Area.visibleLights[i].Radius);
-                                ln++;
-                            }
-                    WorldEffect.Parameters["LightCount"].SetValue(ln);
-                    WorldEffect.Parameters["LightColors"].SetValue(lc);
-                    WorldEffect.Parameters["LightPositions"].SetValue(lp);
-                    
-                    WorldEffect.CurrentTechnique = WorldEffect.Techniques["Shadow"];
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, WorldEffect);
+                    spriteBatch.Begin();
                     spriteBatch.Draw(SceneTarget, Vector2.Zero, Color.White);
                     spriteBatch.End();
                     break;
             }
 
             // UI overlays
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            spriteBatch.Begin();
             MainFrame.Draw(spriteBatch);
             spriteBatch.Draw(CursorTexture, new Vector2(Input.ms.X, Input.ms.Y), Color.Red);
 
             Debug.DrawText(spriteBatch, UIElement.Fonts["Consolas9"]);
-            spriteBatch.DrawString(UIElement.Fonts["Consolas9"], fps.ToString(), new Vector2(5, Window.ClientBounds.Height - 20), fps < 20 ? Color.Red : Color.Gray);
+            spriteBatch.DrawString(UIElement.Fonts["Consolas9"], fps.ToString(), new Vector2(5, Window.ClientBounds.Height - 20), fps < 20 ? Color.Red : Color.DarkGray);
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
         void loadGame() {
-            Area = new Area(Biome.Desert, 0);
-            Area.Generate();
+
+            Area = new Area(Biome.Forest, 0);
+
             Player = new Player(Area);
-            Player.Position = new Vector2(Area.Width / 2 * Tile.TILE_SIZE, Area.Height / 2 * Tile.TILE_SIZE);
-            Camera.CurrentCamera = new Camera();
+
+            Area.Generate(GraphicsDevice);
+            Area.Physics.AddBody(Player.RigidBody);
+            Area.WorldObjects.Add(Player);
 
             MainFrame.Children["Main Menu"].Visible = false;
             MainFrame.Children["Load"].Visible = true;
             GameState = GameState.Loading;
+
+            Camera.CurrentCamera = new Camera();
         }
 
         void exitGame() {

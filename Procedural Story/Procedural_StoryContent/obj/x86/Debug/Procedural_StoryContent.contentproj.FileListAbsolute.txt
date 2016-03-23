@@ -1,1 +1,1 @@
-c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_StoryContent\obj\x86\Debug\Procedural_StoryContent.contentprojResolveAssemblyReference.cache
+C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_StoryContent\obj\x86\Debug\Procedural_StoryContent.contentprojResolveAssemblyReference.cache

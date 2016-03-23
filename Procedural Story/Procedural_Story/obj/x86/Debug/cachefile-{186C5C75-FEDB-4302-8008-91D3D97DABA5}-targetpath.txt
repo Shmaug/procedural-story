@@ -1,9 +1,11 @@
 Content\font\Consolas9.xnb
 Content\font\Avenir36.xnb
 Content\sprite\ui\cursor.xnb
-Content\sprite\env\desert.xnb
-Content\sprite\bomb.xnb
-Content\sprite\char\player.xnb
 Content\sprite\ui\icons.xnb
 Content\sprite\ui\hud.xnb
-Content\fx\world.xnb
+Content\fx\model.xnb
+Content\model\Tree_01.xnb
+Content\model\Tree_02.xnb
+Content\model\Grass_01.xnb
+Content\model\player.xnb
+Content\model\Box.xnb

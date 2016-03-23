@@ -22,7 +22,7 @@ namespace Procedural_Story {
         }
 
         public static void Track(object l, int slot) {
-            labels[slot] = l.ToString();
+            labels[slot] = l != null ? l.ToString() : "null";
         }
         
         public static void DrawText(SpriteBatch batch, SpriteFont font) {
