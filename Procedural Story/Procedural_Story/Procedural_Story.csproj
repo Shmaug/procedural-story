@@ -79,7 +79,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />
-    <Compile Include="World\Life\HouseHold.cs" />
+    <Compile Include="Util\Animations.cs" />
+    <Compile Include="World\Life\Animation.cs" />
+    <Compile Include="World\Life\Character.cs" />
+    <Compile Include="World\Life\ComplexCharacter.cs" />
+    <Compile Include="World\Life\Home.cs" />
     <Compile Include="Util\Models.cs" />
     <Compile Include="Util\Noise.cs" />
     <Compile Include="Util\Util.cs" />

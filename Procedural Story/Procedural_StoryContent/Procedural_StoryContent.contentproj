@@ -74,13 +74,13 @@
       <Name>Tree_01</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
-      <ProcessorParameters_Scale>0.5</ProcessorParameters_Scale>
+      <ProcessorParameters_Scale>2.5</ProcessorParameters_Scale>
     </Compile>
     <Compile Include="model\Tree_02.fbx">
       <Name>Tree_02</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
-      <ProcessorParameters_Scale>0.5</ProcessorParameters_Scale>
+      <ProcessorParameters_Scale>2.5</ProcessorParameters_Scale>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +88,7 @@
       <Name>Grass_01</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
-      <ProcessorParameters_Scale>0.5</ProcessorParameters_Scale>
+      <ProcessorParameters_Scale>2.5</ProcessorParameters_Scale>
     </Compile>
   </ItemGroup>
   <ItemGroup>

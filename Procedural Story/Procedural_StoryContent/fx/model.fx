@@ -73,7 +73,7 @@ VertexShaderOutput ModelVS(float4 Position : POSITION0, float3 Normal : NORMAL0,
 
 VertexShaderOutput InstancedVS(float4 Position : POSITION0, float3 Normal : NORMAL0, float4x4 transform : BLENDWEIGHT)
 {
-	return CommonVS(Position, Normal, 1, 0, mul(transpose(transform), World));
+	return CommonVS(Position, Normal, 1, 0, mul(World, transpose(transform)));
 }
 
 float4 DiffusePS(VertexShaderOutput input) : COLOR0

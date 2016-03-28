@@ -53,21 +53,21 @@
       <Processor>EffectProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\fx\model.xnb</Output>
-      <Time>2016-03-22T20:13:37.1153625-07:00</Time>
+      <Time>2016-03-26T22:42:40.116773-07:00</Time>
     </Item>
     <Item>
       <Source>model\Tree_01.fbx</Source>
       <Importer>FbxImporter</Importer>
       <Options>IntermediateFile, DontCacheImportedData</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_01_0.xml</Output>
-      <Time>2016-03-20T12:26:47.932248-07:00</Time>
+      <Time>2016-03-26T22:42:27.4808421-07:00</Time>
     </Item>
     <Item>
       <Source>model\Tree_02.fbx</Source>
       <Importer>FbxImporter</Importer>
       <Options>IntermediateFile, DontCacheImportedData</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_02_0.xml</Output>
-      <Time>2016-03-20T12:27:48.9898673-07:00</Time>
+      <Time>2016-03-26T22:42:14.1641015-07:00</Time>
     </Item>
     <Item>
       <Source>model\Grass_01.fbx</Source>
@@ -81,55 +81,7 @@
       <Importer>FbxImporter</Importer>
       <Options>IntermediateFile, DontCacheImportedData</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\player_0.xml</Output>
-      <Time>2016-03-22T03:53:47.3526769-07:00</Time>
-    </Item>
-    <Item>
-      <Source>model\Tree_01.fbx</Source>
-      <Name>model\Tree_01</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">0.5</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_01.xnb</Output>
-      <Time>2016-03-20T12:26:47.932248-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_01_0.xml</Key>
-        <Value>2016-03-21T21:03:02.9518183-07:00</Value>
-      </Dependency>
-    </Item>
-    <Item>
-      <Source>model\Tree_02.fbx</Source>
-      <Name>model\Tree_02</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">0.5</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_02.xnb</Output>
-      <Time>2016-03-20T12:27:48.9898673-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_02_0.xml</Key>
-        <Value>2016-03-21T21:03:03.0538177-07:00</Value>
-      </Dependency>
-    </Item>
-    <Item>
-      <Source>model\Grass_01.fbx</Source>
-      <Name>model\Grass_01</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">0.5</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Grass_01.xnb</Output>
-      <Time>2016-03-20T12:31:02.2382463-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Grass_01_0.xml</Key>
-        <Value>2016-03-21T21:03:03.0958206-07:00</Value>
-      </Dependency>
+      <Time>2016-03-27T14:37:51.3228113-07:00</Time>
     </Item>
     <Item>
       <Source>model\player.fbx</Source>
@@ -141,10 +93,10 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\player.xnb</Output>
-      <Time>2016-03-22T03:53:47.3526769-07:00</Time>
+      <Time>2016-03-27T14:37:51.3228113-07:00</Time>
       <Dependency>
         <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\player_0.xml</Key>
-        <Value>2016-03-22T03:53:49.1423302-07:00</Value>
+        <Value>2016-03-27T14:38:28.1510194-07:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -166,6 +118,54 @@
       <Options>IntermediateFile, DontCacheImportedData</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Box_0.xml</Output>
       <Time>2016-03-23T12:30:26.7577438-07:00</Time>
+    </Item>
+    <Item>
+      <Source>model\Grass_01.fbx</Source>
+      <Name>model\Grass_01</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">2.5</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Grass_01.xnb</Output>
+      <Time>2016-03-20T12:31:02.2382463-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Grass_01_0.xml</Key>
+        <Value>2016-03-21T21:03:03.0958206-07:00</Value>
+      </Dependency>
+    </Item>
+    <Item>
+      <Source>model\Tree_01.fbx</Source>
+      <Name>model\Tree_01</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">2.5</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_01.xnb</Output>
+      <Time>2016-03-26T22:42:27.4808421-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_01_0.xml</Key>
+        <Value>2016-03-26T22:42:42.5691411-07:00</Value>
+      </Dependency>
+    </Item>
+    <Item>
+      <Source>model\Tree_02.fbx</Source>
+      <Name>model\Tree_02</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">2.5</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_02.xnb</Output>
+      <Time>2016-03-26T22:42:14.1641015-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_02_0.xml</Key>
+        <Value>2016-03-26T22:42:42.7122463-07:00</Value>
+      </Dependency>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

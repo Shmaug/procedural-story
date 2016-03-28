@@ -11,42 +11,32 @@ using Jitter.LinearMath;
 
 using Procedural_Story.Util;
 
-namespace Procedural_Story.World {
-    class Player : ModelObject {
-        public readonly float Height = 2.2f;
-        public readonly float Radius = .5f;
+namespace Procedural_Story.World.Life {
+    class Player : Character {
 
-        Area Area;
+        public bool FreeCam = false;
+        float CameraDistance = 10;
 
-        float armRot;
-        float armDelta = 1;
-        Matrix[] origTransforms;
+        public Player(Area area) : base(area) {
 
-        float BodyRotation;
-
-        public Player(Area area) : base(Vector3.Zero, Models.PlayerModel, area) {
-            Area = area;
-
-            RigidBody = new RigidBody(new CapsuleShape(Height - Radius * 2, Radius));
-            RigidBody.AllowDeactivation = false;
-            RigidBody.Material.Restitution = 0;
-
-            DrawOffset = new Vector3(0, .1f, 0);
-
-            origTransforms = new Matrix[transforms.Length];
-            Array.Copy(transforms, origTransforms, transforms.Length);
         }
 
         public override void Update(GameTime gameTime) {
-            // rotate head
-            Vector3 a = Matrix.CreateRotationY(Camera.CurrentCamera.Rotation.Y).Forward;
-            Vector3 b = Matrix.CreateRotationY(BodyRotation).Forward;
-            float ang = (float)Math.Acos(Vector3.Dot(a, b)) * Math.Sign(Vector3.Cross(b, a).Y);
-            transforms[2] = origTransforms[2] * Matrix.CreateRotationY(
-                MathHelper.Clamp(ang, -MathHelper.Pi * .3f, MathHelper.Pi * .3f));
+            #region input
+            if (Input.ms.RightButton == ButtonState.Pressed) {
+                Camera.CurrentCamera.Rotation.X -= (Input.ms.Y - Input.lastms.Y) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
+                Camera.CurrentCamera.Rotation.Y -= (Input.ms.X - Input.lastms.X) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
 
-            // gather input
-            Vector3 Move = Vector3.Zero;
+                Camera.CurrentCamera.Rotation.X = MathHelper.Clamp(Camera.CurrentCamera.Rotation.X, -MathHelper.PiOver2, MathHelper.PiOver2);
+                Camera.CurrentCamera.Rotation.Y = MathHelper.WrapAngle(Camera.CurrentCamera.Rotation.Y);
+            }
+
+            if (Input.ms.ScrollWheelValue > Input.lastms.ScrollWheelValue)
+                CameraDistance = Math.Max(CameraDistance - 2, 4);
+            else if (Input.ms.ScrollWheelValue < Input.lastms.ScrollWheelValue)
+                CameraDistance = Math.Min(CameraDistance + 2, 10);
+
+            Move = Vector3.Zero;
             if (Input.ks.IsKeyDown(Keys.W))
                 Move += Vector3.Forward;
             else if (Input.ks.IsKeyDown(Keys.S))
@@ -55,64 +45,73 @@ namespace Procedural_Story.World {
                 Move += Vector3.Left;
             else if (Input.ks.IsKeyDown(Keys.D))
                 Move += Vector3.Right;
-            
+
+            if (Input.ks.IsKeyDown(Keys.C) && Input.lastks.IsKeyUp(Keys.C))
+                FreeCam = !FreeCam;
+
+            if (Input.ms.LeftButton == ButtonState.Pressed) {
+                if (!Attacking) {
+                    Animation a = Animations.CharacterSwing;
+                    a.AnimationCompleted += () => {
+                        RemoveAnimation("Swing");
+                        Attacking = false;
+                    };
+                    PlayAnimation("Swing", a);
+                    Attacking = true;
+                }
+            }
+            #endregion
+
+            #region move player (camera if freecam)
             if (Move != Vector3.Zero) {
                 Move.Normalize();
-                Move = Vector3.Transform(Move, Matrix.CreateRotationY(Camera.CurrentCamera.Rotation.Y));
-                
-                a = Move;
-                ang = (float)Math.Acos(Vector3.Dot(a, b)) * Math.Sign(Vector3.Cross(b, a).Y);
-                BodyRotation = MathHelper.Lerp(BodyRotation, BodyRotation + ang, (float)gameTime.ElapsedGameTime.TotalSeconds * 15f);
-                Orientation = Matrix.CreateRotationY(BodyRotation);
-
-                Move *= 10;
+                Move *= 7;
                 if (Input.ks.IsKeyDown(Keys.LeftControl))
-                    Move *= .5f;
+                    Move *= .25f;
                 else if (Input.ks.IsKeyDown(Keys.LeftShift))
-                    Move *= 2f;
+                    Move *= 1.35f;
             }
-
-            Vector3 delta = Move - Velocity;
-            delta.Y = 0;
-
-            delta *= .05f;
-
-            if (Velocity.Y >= Move.Y)
-                Move.Y = 0;
-
-            if (delta.LengthSquared() > 0)
-                RigidBody.ApplyImpulse(new JVector(delta.X, 0, delta.Z) * RigidBody.Mass);
-
-            if (Input.ks.IsKeyDown(Keys.Space)) {
-                // Jump if we're on the ground
-                JVector norm;
-                float frac = 1;
-                RigidBody hit;
-                bool cast = Area.Physics.CollisionSystem.Raycast(RigidBody.Position, JVector.Down * (Height * .5f),
-                    (RigidBody bd, JVector n, float d) => {
-                        return bd != RigidBody;
-                    },
-                    out hit, out norm, out frac);
-                if (cast)
-                    RigidBody.ApplyImpulse(new JVector(0, 7, 0) * RigidBody.Mass);
-            }
-
-            // animate arms n shit
-            float v = new Vector2(Velocity.X, Velocity.Z).Length();
-            if (v > .01f) {
-                armRot += armDelta * v * (float)gameTime.ElapsedGameTime.TotalSeconds * .7f;
-                if (armRot > MathHelper.PiOver4 && armDelta > 0)
-                    armDelta = -1;
-                if (armRot < -MathHelper.PiOver4 && armDelta < 0)
-                    armDelta = 1;
+            if (FreeCam) {
+                if (Move != Vector3.Zero) {
+                    Move = Vector3.Transform(Move, Camera.CurrentCamera.RotationMatrix);
+                    Camera.CurrentCamera.Position += Move / 10;
+                    Move = Vector3.Zero;
+                }
             } else {
-                armRot = armRot * .5f;
+                if (Move != Vector3.Zero)
+                    Move = Vector3.Transform(Move, Matrix.CreateRotationY(Camera.CurrentCamera.Rotation.Y));
+                
+                // Jump if we're on the ground
+                if (Input.ks.IsKeyDown(Keys.Space))
+                    Move.Y = 7;
             }
+            #endregion
+
+            Look = Camera.CurrentCamera.Rotation;
+            base.Update(gameTime);
         }
 
         public override void PostUpdate() {
-            Orientation = Matrix.CreateRotationY(BodyRotation);
-            RigidBody.AngularVelocity = JVector.Zero;
+            base.PostUpdate();
+
+            if (!FreeCam) {
+                Vector3 dir = Camera.CurrentCamera.RotationMatrix.Backward * CameraDistance;
+                Vector3 pos = Position + new Vector3(0, Height * .5f - .2f, 0);
+                float dist = CameraDistance;
+
+                JVector norm;
+                float frac = 1;
+                RigidBody hit;
+                bool cast = Area.Physics.CollisionSystem.Raycast(new JVector(pos.X, pos.Y, pos.Z), new JVector(dir.X, dir.Y, dir.Z),
+                (RigidBody bd, JVector n, float d) => {
+                    return bd != RigidBody;
+                },
+                out hit, out norm, out frac);
+                if (cast && frac < 1)
+                    dist = frac * CameraDistance - .2f;
+
+                Camera.CurrentCamera.Position = pos + Camera.CurrentCamera.RotationMatrix.Backward * dist;
+            }
         }
     }
 }

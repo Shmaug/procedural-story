@@ -10,14 +10,13 @@ using Jitter.Collision;
 using Jitter.Collision.Shapes;
 
 using Procedural_Story.Util;
+using Procedural_Story.World.Life;
 
 namespace Procedural_Story.World {
     enum Biome {
-        Desert,
-        Forest,
-        Plains
+        Forest
     }
-    
+
     class Region {
         public Vector3 Point;
         public Vector3 Center;
@@ -33,6 +32,8 @@ namespace Procedural_Story.World {
 
         public List<Matrix>[] Grass;
         public List<Matrix>[] Trees;
+        
+        public List<RigidBody> treeBodies;
 
         public VertexBuffer VertexBuffer;
         public IndexBuffer IndexBuffer;
@@ -43,6 +44,7 @@ namespace Procedural_Story.World {
             Elevation = pt.Y;
             Point = pt;
             Verticies = new List<Vector3>();
+            treeBodies = new List<RigidBody>();
         }
 
         public bool Contains(Vector3 pt) {
@@ -65,26 +67,29 @@ namespace Procedural_Story.World {
         public float LoadProgress { get; private set; }
         public string LoadMessage { get; private set; }
         public List<wObject> WorldObjects;
-        public List<HouseHold> HouseHolds;
+        public List<Character> Characters;
+        public List<Home> HouseHolds;
         Region[] VoronoiCells;
         Random rand;
 
         DynamicVertexBuffer GrassVertexBuffer;
         DynamicVertexBuffer TreeVertexBuffer;
 
-        BenTools.Mathematics.VoronoiGraph graph;
+        BenTools.Mathematics.VoronoiGraph voronoiGraph;
 
-        public CollisionSystemSAP CollisionSystem;
+        public CollisionSystem CollisionSystem;
         public Jitter.World Physics;
 
         public Vector3 LightDirection = new Vector3(-.6f, -.4f, 0);
         public float LightPlaneDistance = 50;
+
+        JitterDrawer jDrawer;
         
         public Area(Biome biome, int seed) {
             Seed = seed;
             Biome = biome;
             WorldObjects = new List<wObject>();
-            HouseHolds = new List<HouseHold>();
+            HouseHolds = new List<Home>();
             CollisionSystem = new CollisionSystemSAP();
             Physics = new Jitter.World(CollisionSystem);
             Physics.Gravity = new Jitter.LinearMath.JVector(0, -20, 0);
@@ -123,12 +128,14 @@ namespace Procedural_Story.World {
             }
             vbuffer.SetData(transforms, 0, transforms.Length, SetDataOptions.Discard);
 
+            Matrix[] transf = new Matrix[model.Bones.Count];
+            model.CopyAbsoluteBoneTransformsTo(transf);
             foreach (ModelMesh m in model.Meshes) {
                 foreach (ModelMeshPart mmp in m.MeshParts) {
                     device.SetVertexBuffers(new VertexBufferBinding(mmp.VertexBuffer, mmp.VertexOffset, 0), new VertexBufferBinding(vbuffer, 0, 1));
                     device.Indices = mmp.IndexBuffer;
 
-                    Models.SceneEffect.Parameters["World"].SetValue(Matrix.Identity);
+                    Models.SceneEffect.Parameters["World"].SetValue(transf[m.ParentBone.Index]);
                     Models.SceneEffect.Parameters["Textured"].SetValue(false);
                     Models.SceneEffect.Parameters["MaterialColor"].SetValue((Vector4)mmp.Tag);
                     Models.SceneEffect.CurrentTechnique = Models.SceneEffect.Techniques["Instanced"];
@@ -143,20 +150,21 @@ namespace Procedural_Story.World {
         public void Update(GameTime gameTime) {
             foreach (wObject o in WorldObjects)
                 o.Update(gameTime);
-
-            foreach (HouseHold h in HouseHolds)
+            foreach (Home h in HouseHolds)
                 h.Update(gameTime);
 
             Physics.Step((float)gameTime.ElapsedGameTime.TotalSeconds, true);
 
             foreach (wObject o in WorldObjects)
                 o.PostUpdate();
-
-            foreach (HouseHold h in HouseHolds)
+            foreach (Home h in HouseHolds)
                 h.PostUpdate();
         }
 
         public void Draw(GraphicsDevice device, bool depth) {
+            if (jDrawer == null)
+                jDrawer = new JitterDrawer(device);
+
             Models.SceneEffect.Parameters["ViewProj"].SetValue(Camera.CurrentCamera.View * Camera.CurrentCamera.Projection);
             Models.SceneEffect.Parameters["DepthDraw"].SetValue(depth);
             Models.SceneEffect.Parameters["LightDirection"].SetValue(LightDirection);
@@ -196,7 +204,7 @@ namespace Procedural_Story.World {
             
             foreach (wObject o in WorldObjects)
                 o.Draw(device);
-            foreach (HouseHold h in HouseHolds)
+            foreach (Home h in HouseHolds)
                 h.Draw(device);
 
             #region draw foiliage
@@ -258,12 +266,12 @@ namespace Procedural_Story.World {
             BenTools.Mathematics.Vector[] pts = new BenTools.Mathematics.Vector[Width / 2];
             for (int i = 0; i < pts.Length; i++)
                 pts[i] = new BenTools.Mathematics.Vector(rand.Next(-Width / 2, Width / 2), rand.Next(-Height / 2, Height / 2));
-            graph = BenTools.Mathematics.Fortune.ComputeVoronoiGraph(pts);
+            voronoiGraph = BenTools.Mathematics.Fortune.ComputeVoronoiGraph(pts);
 
-            BenTools.Mathematics.Vector[] verts = graph.Vertizes.ToArray();
-            BenTools.Mathematics.VoronoiEdge[] edges = graph.Edges.ToArray();
+            BenTools.Mathematics.Vector[] verts = voronoiGraph.Vertizes.ToArray();
+            BenTools.Mathematics.VoronoiEdge[] edges = voronoiGraph.Edges.ToArray();
 
-            // compute cells
+            // compute cells from verticies
             List<Region> rg = new List<Region>();
             for (int i = 0; i < pts.Length; i++) {
                 rg.Add(
@@ -398,6 +406,7 @@ namespace Procedural_Story.World {
         }
 
         void genForest(object state = null) {
+            GraphicsDevice device = (GraphicsDevice)state;
             LoadMessage = "Generating cells...";
             genVoronoi();
 
@@ -455,9 +464,9 @@ namespace Procedural_Story.World {
                     inds.Add(b + 3);
                 }
 
-                cell.VertexBuffer = new VertexBuffer((GraphicsDevice)state, typeof(VertexPositionColorNormal), verts.Count, BufferUsage.WriteOnly);
+                cell.VertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormal), verts.Count, BufferUsage.WriteOnly);
                 cell.VertexBuffer.SetData(verts.ToArray());
-                cell.IndexBuffer = new IndexBuffer((GraphicsDevice)state, typeof(int), inds.Count, BufferUsage.WriteOnly);
+                cell.IndexBuffer = new IndexBuffer(device, typeof(int), inds.Count, BufferUsage.WriteOnly);
                 cell.IndexBuffer.SetData<int>(inds.ToArray());
                 #endregion
                 #region generate rigidbody
@@ -488,7 +497,6 @@ namespace Procedural_Story.World {
 
                         if (CellAt(pt) == cell)
                             cell.Grass[rand.Next(0, cell.Grass.Length)].Add(
-                                Matrix.CreateScale(5) *
                                 Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) *
                                 Matrix.CreateTranslation(pt)
                                 );
@@ -497,14 +505,20 @@ namespace Procedural_Story.World {
 
                 for (float x = cell.Min.X; x < cell.Max.X; x += 5f / cell.TreeDensity) {
                     for (float z = cell.Min.Z; z < cell.Max.Z; z += 5f / cell.TreeDensity) {
-                        Vector3 pt = new Vector3(x, cell.Elevation, z) + new Vector3((float)rand.NextDouble() - .5f, 0, (float)rand.NextDouble() - .5f)*3;
+                        Vector3 pt = new Vector3(x, cell.Elevation, z) + new Vector3((float)rand.NextDouble() - .5f, 0, (float)rand.NextDouble() - .5f) * 3;
 
-                        if (CellAt(pt) == cell)
-                            cell.Trees[rand.Next(0, cell.Trees.Length)].Add(
-                                Matrix.CreateScale(5) *
-                                Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) *
-                                Matrix.CreateTranslation(pt + Vector3.Up * .65f)
-                                );
+                        if (CellAt(pt) == cell) {
+                            int c = rand.Next(0, cell.Trees.Length);
+                            Matrix m = Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) * Matrix.CreateTranslation(pt);
+                            cell.Trees[c].Add(m);
+
+                            RigidBody b = new RigidBody(new CylinderShape(7, .8f));
+                            b.Tag = new { c, m };
+                            b.Position = new Jitter.LinearMath.JVector(pt.X, pt.Y + 2.5f, pt.Z);
+                            b.IsStatic = true;
+                            //cell.treeBodies.Add(b);
+                            Physics.AddBody(b);
+                        }
                     }
                 }
                 #endregion
@@ -516,31 +530,26 @@ namespace Procedural_Story.World {
             LoadMessage = "Generating houses";
             LoadProgress = 0;
 
-            for (int i = rand.Next(1, 4); i < VoronoiCells.Length / 3;) {
-                HouseHold home = new HouseHold(VoronoiCells[i].Center + Vector3.Up * 2.5f, this);
+            for (int i = rand.Next(0, 20); i < VoronoiCells.Length;) {
+                Home home = new Home(VoronoiCells[i].Center, this, rand.Next());
+                home.Orientation = Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi);
+                home.GenerateFloorPlan();
+                home.BuildGeometry(device);
                 HouseHolds.Add(home);
-                BoundingBox hbox = new BoundingBox(VoronoiCells[i].Center - new Vector3(4f, 1f, 4f), VoronoiCells[i].Center + new Vector3(4f, 5f, 4f));
 
-                for (int j = 0; j < VoronoiCells[i].Grass.Length; j++) {
-                    for (int g = 0; g < VoronoiCells[i].Grass[j].Count; g++) {
-                        if (hbox.Contains(VoronoiCells[i].Grass[j][g].Translation) != ContainmentType.Disjoint) {
-                            VoronoiCells[i].Grass[j].Remove(VoronoiCells[i].Grass[j][g]);
-                            g--;
-                        }
-                    }
-                }
+                ComplexCharacter c = new ComplexCharacter(this);
+                c.Position = home.Position + new Vector3(0, c.Height, 0);
+                WorldObjects.Add(c);
+                home.Residents.Add(c);
+                Physics.AddBody(c.RigidBody);
 
-                for (int j = 0; j < VoronoiCells[i].Trees.Length; j++) {
-                    for (int t = 0; t < VoronoiCells[i].Trees[j].Count; t++) {
-                        if (hbox.Contains(VoronoiCells[i].Trees[j][t].Translation) != ContainmentType.Disjoint) {
-                            VoronoiCells[i].Trees[j].Remove(VoronoiCells[i].Trees[j][t]);
-                            t--;
-                        }
-                    }
-                }
+                // get rid of the grass and trees at this cell
+                for (int g = 0; g < VoronoiCells[i].Grass.Length; g++)
+                    VoronoiCells[i].Grass[g].Clear();
+                for (int t = 0; t < VoronoiCells[i].Trees.Length; t++)
+                    VoronoiCells[i].Trees[t].Clear();
 
-
-                i += rand.Next(1, 4);
+                i += rand.Next(10, 20);
             }
 
             LoadProgress = 1;

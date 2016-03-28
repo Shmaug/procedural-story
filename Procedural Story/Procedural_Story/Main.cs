@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Media;
 
 using Procedural_Story.UI;
 using Procedural_Story.World;
+using Procedural_Story.World.Life;
 using Procedural_Story.Util;
 
 using Jitter;
@@ -202,18 +203,7 @@ namespace Procedural_Story {
                     MainFrame.Children["Load"].Children["bar"].Children["bar"].Size.Scale.X = Area.LoadProgress;
                     break;
                 case GameState.InGame:
-                    if (Input.ms.RightButton == ButtonState.Pressed)
-                        Camera.CurrentCamera.Rotation.Y -= (Input.ms.X - Input.lastms.X) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
-                    
                     Area.Update(gameTime);
-
-                    if (Input.ms.RightButton == ButtonState.Pressed) {
-                        //Camera.CurrentCamera.Rotation.X -= (Input.ms.Y - Input.lastms.Y) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
-                        Camera.CurrentCamera.Rotation.Y -= (Input.ms.X - Input.lastms.X) * (float)gameTime.ElapsedGameTime.TotalSeconds * .3f;
-                    }
-                    Camera.CurrentCamera.Rotation.X = MathHelper.ToRadians(-25);
-                    Camera.CurrentCamera.Position = Player.Position + Vector3.Up * 2 + Camera.CurrentCamera.RotationMatrix.Backward * 10;
-
                     break;
             }
 
