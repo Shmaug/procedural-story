@@ -2,7 +2,7 @@ float4x4 ViewProj;
 float4x4 World;
 
 float3 LightDirection = float3(-.5, -.5, 0);
-float AmbientBrightness = .5;
+float AmbientBrightness = .5f;
 
 bool Textured;
 float4 MaterialColor;
@@ -66,6 +66,11 @@ VertexShaderOutput VBOVS(float4 Position : POSITION0, float3 Normal : NORMAL0, f
 	return CommonVS(Position, Normal, Color, 0, World);
 }
 
+VertexShaderOutput WaterVS(float4 Position : POSITION0, float2 UV : TEXCOORD0)
+{
+	return CommonVS(Position, float3(0, 1, 0), float4(0.3, 0.35, .8, 1), UV, World);
+}
+
 VertexShaderOutput ModelVS(float4 Position : POSITION0, float3 Normal : NORMAL0, float2 UV : TEXCOORD0)
 {
     return CommonVS(Position, Normal, 1, UV, World);
@@ -102,6 +107,15 @@ float4 DiffusePS(VertexShaderOutput input) : COLOR0
 	}
 }
 
+float4 WaterPS(VertexShaderOutput input) : COLOR0
+{
+	if (DepthDraw)
+		return float4(input.depth, 0, 0, 0);
+	else {
+		return float4(saturate(input.Color * saturate(AmbientBrightness + .5f)), .75f);
+	}
+}
+
 technique Model
 {
     pass Pass1
@@ -132,5 +146,13 @@ technique Instanced
 	{
 		VertexShader = compile vs_3_0 InstancedVS();
 		PixelShader = compile ps_3_0 DiffusePS();
+	}
+}
+technique Water
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 WaterVS();
+		PixelShader = compile ps_3_0 WaterPS();
 	}
 }

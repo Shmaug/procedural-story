@@ -78,6 +78,7 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TODO.txt" />
     <Compile Include="Debug.cs" />
     <Compile Include="Util\Animations.cs" />
     <Compile Include="World\Life\Animation.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="UI\Button.cs" />
     <Compile Include="UI\ImageLabel.cs" />
-    <Compile Include="UI\Label.cs" />
+    <Compile Include="UI\TextLabel.cs" />
     <Compile Include="UI\Frame.cs" />
     <Compile Include="UI\UIElement.cs" />
     <Compile Include="World\Area.cs" />

@@ -18,7 +18,6 @@ c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural
 c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\icons.xnb
 c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\hud.xnb
 c:\users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Consolas9.xnb
-C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\fx\model.xnb
 C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_01.xnb
 C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_02.xnb
 C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Grass_01.xnb
@@ -26,3 +25,4 @@ C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural
 C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\player.xnb
 C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Jitter.dll
 C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Box.xnb
+C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\fx\world.xnb

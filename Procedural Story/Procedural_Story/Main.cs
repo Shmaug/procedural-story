@@ -159,6 +159,7 @@ namespace Procedural_Story {
 
             Frame loadFrame = new Frame(MainFrame, "Load", new UDim2(0, 0, 0, 0), new UDim2(1, 1, 0, 0), Color.Black);
             loadFrame.Visible = false;
+            new TextLabel(loadFrame, "text", new UDim2(.5f, .5f, -100, -100), new UDim2(0, 0, 200, 20), "Loading", "Avenir36", Color.White); // oh god what have i done
             new ImageLabel(
                 new ImageLabel(loadFrame, "bar", new UDim2(.5f, .5f, -100, -10), new UDim2(0, 0, 200, 20), UIElement.BlankTexture, Color.DarkSlateGray) // oh god what have i done
                 , "bar", new UDim2(0, 0, 1, 1), new UDim2(0, 1, -2, -2), UIElement.BlankTexture, Color.White);
@@ -195,11 +196,12 @@ namespace Procedural_Story {
 
             switch (GameState) {
                 case GameState.Loading:
-                    if (Area.LoadProgress >= 1) {
+                    if (Area.LoadProgress >= 2) {
                         GameState = GameState.InGame;
                         MainFrame.Children["Load"].Visible = false;
-                        Player.Position = new Vector3(0, Area.CellAt(Player.Position).Elevation + Player.Height * .5f, 0);
+                        Player.Position = new Vector3(Area.RealWidth * .5f, Area.HeightAt(Area.RealWidth * .5f, Area.RealHeight * .5f), Area.RealHeight * .5f);
                     }
+                    (MainFrame.Children["Load"].Children["text"] as TextLabel).Text = Area.LoadMessage;
                     MainFrame.Children["Load"].Children["bar"].Children["bar"].Size.Scale.X = Area.LoadProgress;
                     break;
                 case GameState.InGame:
@@ -232,16 +234,16 @@ namespace Procedural_Story {
                     GraphicsDevice.SetRenderTarget(DepthTarget);
                     GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
                     GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferFunction = CompareFunction.LessEqual };
-                    Models.SceneEffect.Parameters["DepthDraw"].SetValue(true);
+                    Models.WorldEffect.Parameters["DepthDraw"].SetValue(true);
                     Area.Draw(GraphicsDevice, true);
                     
                     // draw scene
                     GraphicsDevice.SetRenderTarget(SceneTarget);
                     GraphicsDevice.Clear(Color.SkyBlue);
                     GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-                    Models.SceneEffect.Parameters["DepthDraw"].SetValue(false);
-                    Models.SceneEffect.Parameters["DepthTexture"].SetValue(DepthTarget);
-                    Models.SceneEffect.Parameters["DepthPixelSize"].SetValue(new Vector2(1f / DepthTarget.Width, 1f / DepthTarget.Height));
+                    Models.WorldEffect.Parameters["DepthDraw"].SetValue(false);
+                    Models.WorldEffect.Parameters["DepthTexture"].SetValue(DepthTarget);
+                    Models.WorldEffect.Parameters["DepthPixelSize"].SetValue(new Vector2(1f / DepthTarget.Width, 1f / DepthTarget.Height));
                     Area.Draw(GraphicsDevice, false);
 
                     GraphicsDevice.SetRenderTarget(null);

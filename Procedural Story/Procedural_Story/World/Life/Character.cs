@@ -31,7 +31,7 @@ namespace Procedural_Story.World.Life {
 
         public Character(Area area) : base(Vector3.Zero, Models.PlayerModel, area) {
             Area = area;
-
+            
             RigidBody = new RigidBody(new CapsuleShape(Height - Radius * 2, Radius));
             RigidBody.AllowDeactivation = false;
             RigidBody.Material.Restitution = 0;
@@ -75,16 +75,16 @@ namespace Procedural_Story.World.Life {
             if (delta.LengthSquared() > 0)
                 RigidBody.ApplyImpulse(new JVector(delta.X, 0, delta.Z) * RigidBody.Mass);
 
-            if (Move.Y > 0) {
+            if (Move.Y > 0 && Velocity.Y < Move.Y) {
                 JVector norm;
-                float frac = 1;
+                float frac = 0;
                 RigidBody hit;
-                bool cast = Area.Physics.CollisionSystem.Raycast(RigidBody.Position, JVector.Down * (Height * .5f),
+                bool cast = Area.Physics.CollisionSystem.Raycast(RigidBody.Position + (JVector.Down * Height * .5f), JVector.Down,
                     (RigidBody bd, JVector n, float d) => {
                         return bd != RigidBody;
                     },
                     out hit, out norm, out frac);
-                if (cast)
+                if (cast && frac < .1f) 
                     RigidBody.ApplyImpulse(new JVector(0, Move.Y, 0) * RigidBody.Mass);
             }
             #endregion

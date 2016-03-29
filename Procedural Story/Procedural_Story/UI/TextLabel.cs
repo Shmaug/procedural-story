@@ -10,14 +10,14 @@ using Procedural_Story;
 
 namespace Procedural_Story.UI
 {
-    class Label : UIElement {
+    class TextLabel : UIElement {
         public AlignmentType TextAlignment;
         public string Text;
         public Color Color;
         public string Font;
         public float TextScale;
 
-        public Label(UIElement parent, string name, UDim2 position, UDim2 size, string text, string font, Color color) : base(parent, name, position, size) {
+        public TextLabel(UIElement parent, string name, UDim2 position, UDim2 size, string text, string font, Color color) : base(parent, name, position, size) {
             Text = text;
             Font = font;
             Color = color;
@@ -26,7 +26,11 @@ namespace Procedural_Story.UI
         }
 
         public override void Draw(SpriteBatch batch) {
-            Vector2 textSize = Fonts[Font].MeasureString(this.Text);
+            if (Text == null) {
+                base.Draw(batch);
+                return;
+            }
+            Vector2 textSize = Fonts[Font].MeasureString(Text);
             Vector2 textSize2 = textSize * .5f;
 
             Vector2 offset = Vector2.Zero;

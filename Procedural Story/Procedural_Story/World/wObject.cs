@@ -139,18 +139,18 @@ namespace Procedural_Story.World {
                 Orientation *
                 Matrix.CreateTranslation(Position + DrawOffset);
 
-                Models.SceneEffect.Parameters["Textured"].SetValue(false);
+                Models.WorldEffect.Parameters["Textured"].SetValue(false);
 
             foreach (ModelMesh mm in Model.Meshes) {
-                Models.SceneEffect.Parameters["World"].SetValue(transforms[mm.ParentBone.Index] * W);
+                Models.WorldEffect.Parameters["World"].SetValue(transforms[mm.ParentBone.Index] * W);
                 foreach (ModelMeshPart mmp in mm.MeshParts) {
-                    mmp.Effect = Models.SceneEffect;
+                    mmp.Effect = Models.WorldEffect;
                     device.SetVertexBuffers(new VertexBufferBinding(mmp.VertexBuffer, mmp.VertexOffset, 0));
                     device.Indices = mmp.IndexBuffer;
 
-                    Models.SceneEffect.Parameters["MaterialColor"].SetValue((Vector4)mmp.Tag);
-                    Models.SceneEffect.CurrentTechnique = Models.SceneEffect.Techniques["Model"];
-                    foreach (EffectPass p in Models.SceneEffect.CurrentTechnique.Passes) {
+                    Models.WorldEffect.Parameters["MaterialColor"].SetValue((Vector4)mmp.Tag);
+                    Models.WorldEffect.CurrentTechnique = Models.WorldEffect.Techniques["Model"];
+                    foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
                         p.Apply();
                         device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mmp.NumVertices, mmp.StartIndex, mmp.PrimitiveCount);
                     }
@@ -175,22 +175,22 @@ namespace Procedural_Story.World {
                 Orientation *
                 Matrix.CreateTranslation(Position);
             
-            Models.SceneEffect.Parameters["World"].SetValue(W);
-            Models.SceneEffect.Parameters["MaterialColor"].SetValue(Vector4.One);
-            Models.SceneEffect.Parameters["Textured"].SetValue(Texture != null);
-            Models.SceneEffect.Parameters["Tex"].SetValue(Texture);
+            Models.WorldEffect.Parameters["World"].SetValue(W);
+            Models.WorldEffect.Parameters["MaterialColor"].SetValue(Vector4.One);
+            Models.WorldEffect.Parameters["Textured"].SetValue(Texture != null);
+            Models.WorldEffect.Parameters["Tex"].SetValue(Texture);
 
-            Models.SceneEffect.CurrentTechnique = Models.SceneEffect.Techniques[Texture != null ? "TexturedVBO" : "VBO"];
+            Models.WorldEffect.CurrentTechnique = Models.WorldEffect.Techniques[Texture != null ? "TexturedVBO" : "VBO"];
             if (VBuffer != null) {
                 device.Indices = IBuffer;
                 device.SetVertexBuffer(VBuffer);
                 if (IBuffer != null)
-                    foreach (EffectPass p in Models.SceneEffect.CurrentTechnique.Passes) {
+                    foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
                         p.Apply();
                         device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VBuffer.VertexCount, 0, IBuffer.IndexCount / 3);
                     }
                 else
-                    foreach (EffectPass p in Models.SceneEffect.CurrentTechnique.Passes) {
+                    foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
                         p.Apply();
                         device.DrawPrimitives(PrimitiveType.TriangleList, 0, VBuffer.VertexCount / 3);
                     }
@@ -225,15 +225,15 @@ namespace Procedural_Story.World {
                 Matrix.CreateScale(Scale) *
                 Matrix.CreateLookAt(Position, Camera.CurrentCamera.Position, Vector3.Up);
             
-            Models.SceneEffect.Parameters["World"].SetValue(W);
-            Models.SceneEffect.Parameters["MaterialColor"].SetValue(Vector4.One);
-            Models.SceneEffect.Parameters["Tex"].SetValue(Texture);
-            Models.SceneEffect.Parameters["Textured"].SetValue(true);
+            Models.WorldEffect.Parameters["World"].SetValue(W);
+            Models.WorldEffect.Parameters["MaterialColor"].SetValue(Vector4.One);
+            Models.WorldEffect.Parameters["Tex"].SetValue(Texture);
+            Models.WorldEffect.Parameters["Textured"].SetValue(true);
 
-            Models.SceneEffect.CurrentTechnique = Models.SceneEffect.Techniques["TexturedVBO"];
+            Models.WorldEffect.CurrentTechnique = Models.WorldEffect.Techniques["TexturedVBO"];
             if (VBuffer != null) {
                 device.SetVertexBuffer(VBuffer);
-                foreach (EffectPass p in Models.SceneEffect.CurrentTechnique.Passes) {
+                foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
                     p.Apply();
                     device.DrawPrimitives(PrimitiveType.TriangleList, 0, VBuffer.VertexCount / 3);
                 }

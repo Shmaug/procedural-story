@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Procedural_Story.Util {
     static class Models {
-        public static Effect SceneEffect;
+        public static Effect WorldEffect;
 
         public static Model PlayerModel;
         public static Model[] TreeModels;
@@ -16,7 +16,7 @@ namespace Procedural_Story.Util {
         public static Model BoxModel;
 
         public static void Load(ContentManager Content) {
-            SceneEffect = Content.Load<Effect>("fx/model");
+            WorldEffect = Content.Load<Effect>("fx/world");
 
             PlayerModel = Content.Load<Model>("model/player");
             TreeModels = new Model[] {
@@ -27,12 +27,12 @@ namespace Procedural_Story.Util {
 
             BoxModel = Content.Load<Model>("model/Box");
 
-            SetMaterialColor(BoxModel, SceneEffect);
-            SetMaterialColor(PlayerModel, SceneEffect);
+            SetMaterialColor(BoxModel, WorldEffect);
+            SetMaterialColor(PlayerModel, WorldEffect);
             for (int i = 0; i < TreeModels.Length; i++)
-                SetMaterialColor(TreeModels[i], SceneEffect);
+                SetMaterialColor(TreeModels[i], WorldEffect);
             for (int i = 0; i < GrassModels.Length; i++)
-                SetMaterialColor(GrassModels[i], SceneEffect);
+                SetMaterialColor(GrassModels[i], WorldEffect);
         }
 
         public static void SetMaterialColor(Model m, Effect e) {

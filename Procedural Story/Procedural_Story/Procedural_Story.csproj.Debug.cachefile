@@ -3,9 +3,9 @@ Content\font\Avenir36.xnb
 Content\sprite\ui\cursor.xnb
 Content\sprite\ui\icons.xnb
 Content\sprite\ui\hud.xnb
-Content\fx\model.xnb
 Content\model\player.xnb
 Content\model\Box.xnb
 Content\model\Grass_01.xnb
 Content\model\Tree_01.xnb
 Content\model\Tree_02.xnb
+Content\fx\world.xnb

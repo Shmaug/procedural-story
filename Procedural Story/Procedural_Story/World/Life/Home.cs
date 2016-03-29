@@ -115,7 +115,7 @@ namespace Procedural_Story.World.Life {
 
                 // floor
                 addBox(
-                    new BoundingBox(c0, c3 + new Vector3(0, .1f, 0)),
+                    new BoundingBox(c0 + new Vector3(0, -2, 0), c3 + new Vector3(0, .1f, 0)),
                     new Color(.57f, .45f, .26f));
 
                 // front wall
@@ -133,10 +133,10 @@ namespace Procedural_Story.World.Life {
                 
                 // wall pillars
                 float pw = ww * 2;
-                addBox(new BoundingBox(c0 + new Vector3(-pw, 0, -pw), c0 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
-                addBox(new BoundingBox(c1 + new Vector3(-pw, 0, -pw), c1 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
-                addBox(new BoundingBox(c2 + new Vector3(-pw, 0, -pw), c2 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
-                addBox(new BoundingBox(c3 + new Vector3(-pw, 0, -pw), c3 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
+                addBox(new BoundingBox(c0 + new Vector3(-pw, -2, -pw), c0 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
+                addBox(new BoundingBox(c1 + new Vector3(-pw, -2, -pw), c1 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
+                addBox(new BoundingBox(c2 + new Vector3(-pw, -2, -pw), c2 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
+                addBox(new BoundingBox(c3 + new Vector3(-pw, -2, -pw), c3 + new Vector3(pw, r.Height + pw, pw)), new Color(.57f, .45f, .26f) * .8f);
             }
 
             VBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormal), verts.Count, BufferUsage.WriteOnly);

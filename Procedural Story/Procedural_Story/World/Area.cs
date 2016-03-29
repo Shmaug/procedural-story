@@ -17,34 +17,18 @@ namespace Procedural_Story.World {
         Forest
     }
 
-    class Region {
+    class Cell {
         public Vector3 Point;
         public Vector3 Center;
         public List<Vector3> Verticies;
         public Vector3 Min;
         public Vector3 Max;
 
-        public float Elevation;
-
-        public float GrassDensity;
-        public float TreeDensity;
-        public float SurfaceArea;
-
-        public List<Matrix>[] Grass;
-        public List<Matrix>[] Trees;
+        public bool isLake;
         
-        public List<RigidBody> treeBodies;
-
-        public VertexBuffer VertexBuffer;
-        public IndexBuffer IndexBuffer;
-
-        public RigidBody RigidBody;
-
-        public Region(Vector3 pt) {
-            Elevation = pt.Y;
+        public Cell(Vector3 pt) {
             Point = pt;
             Verticies = new List<Vector3>();
-            treeBodies = new List<RigidBody>();
         }
 
         public bool Contains(Vector3 pt) {
@@ -59,9 +43,37 @@ namespace Procedural_Story.World {
         }
     }
 
+    class Chunk {
+        public const int ChunkSize = 32;
+
+        public int X;
+        public int Z;
+        public List<Matrix>[] Grass;
+        public List<Matrix>[] Trees;
+        public List<RigidBody> treeBodies;
+        public VertexBuffer VertexBuffer;
+        public IndexBuffer IndexBuffer;
+        public BoundingBox bBox;
+
+        public Chunk(int x, int z) {
+            X = x;
+            Z = z;
+        }
+    }
+
     class Area {
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public int RealWidth {
+            get {
+                return Width * Chunk.ChunkSize;
+            }
+        }
+        public int RealHeight {
+            get {
+                return Height * Chunk.ChunkSize;
+            }
+        }
         public int Seed { get; private set; }
         public Biome Biome { get; private set; }
         public float LoadProgress { get; private set; }
@@ -69,12 +81,25 @@ namespace Procedural_Story.World {
         public List<wObject> WorldObjects;
         public List<Character> Characters;
         public List<Home> HouseHolds;
-        Region[] VoronoiCells;
         Random rand;
+        
+        public float GrassDrawDistance = 100;
 
         DynamicVertexBuffer GrassVertexBuffer;
         DynamicVertexBuffer TreeVertexBuffer;
 
+        VertexBuffer WaterVertexBuffer;
+        IndexBuffer WaterIndexBuffer;
+        Cell[] VoronoiCells;
+
+        Chunk[,] Chunks;
+        
+        public RigidBody TerrainBody;
+
+        float[,] heightMap;
+        float heightMapScale = 1;
+        float WaterHeight = 0;
+        
         BenTools.Mathematics.VoronoiGraph voronoiGraph;
 
         public CollisionSystem CollisionSystem;
@@ -101,22 +126,64 @@ namespace Procedural_Story.World {
         }
         
         public bool Contains(Vector3 p) {
-            return p.X >= -Width * .5f && p.X <= Width * .5f && p.Z >= -Height * .5f && p.Z <= Height * .5f;
+            return p.X >= 0 && p.X <= RealWidth && p.Z >= 0 && p.Z <= RealHeight;
         }
-        
-        public Region CellAt(Vector3 pos) {
-            float dist = float.MaxValue;
-            int cin = -1;
+
+        public Cell CellAt(Vector3 p) {
+            return CellAt(p.X, p.Z);
+        }
+        public Cell CellAt(float x, float z) {
+            Cell c = null;
+            float d = float.MaxValue;
             for (int i = 0; i < VoronoiCells.Length; i++) {
-                float d = Vector2.DistanceSquared(new Vector2(pos.X, pos.Z), new Vector2(VoronoiCells[i].Point.X, VoronoiCells[i].Point.Z));
-                if (d < dist) {
-                    dist = d;
-                    cin = i;
+                float d2 = Vector2.DistanceSquared(new Vector2(x, z), new Vector2(VoronoiCells[i].Point.X, VoronoiCells[i].Point.Z));
+                if (d2 < d) {
+                    d = d2;
+                    c = VoronoiCells[i];
                 }
             }
-            if (cin == -1)
-                return null;
-            return VoronoiCells[cin];
+            return c;
+        }
+
+        public float HeightAt(Vector3 p) {
+            return HeightAt(p.X, p.Z);
+        }
+        public float HeightAt(float x, float z) {
+            int minx = (int)(x / heightMapScale);
+            int minz = (int)(z / heightMapScale);
+            int maxx = minx + 1;
+            int maxz = minz + 1;
+            float fx = (x / heightMapScale) - minx;
+            float fz = (z / heightMapScale) - minz;
+            float a = fx * fz;
+
+            if (minx >= 0 && minz >= 0 && maxx < RealWidth && maxz < RealHeight) {
+                Vector3 v1, v2, v3;
+                if (a < .5f) {
+                    v1 = new Vector3(minx * heightMapScale, heightMap[minx, minz], minz * heightMapScale);
+                    v2 = new Vector3((minx + 1) * heightMapScale, heightMap[minx + 1, minz], minz * heightMapScale);
+                    v3 = new Vector3(minx * heightMapScale, heightMap[minx, minz + 1], (minz + 1) * heightMapScale);
+                } else {
+                    v1 = new Vector3((minx + 1) * heightMapScale, heightMap[minx + 1, minz], minz * heightMapScale);
+                    v2 = new Vector3((minx + 1) * heightMapScale, heightMap[minx + 1, minz + 1], (minz + 1) * heightMapScale);
+                    v3 = new Vector3(minx * heightMapScale, heightMap[minx, minz + 1], (minz + 1) * heightMapScale);
+                }
+
+                float det = (v2.Z - v3.Z) * (v1.X - v3.X) + (v3.X - v2.X) * (v1.Z - v3.Z);
+                float b1 = ((v2.Z - v3.Z) * (x - v3.X) + (v3.X - v2.X) * (z - v3.Z)) / det;
+                float b2 = ((v3.Z - v1.Z) * (x - v3.X) + (v1.X - v3.X) * (z - v3.Z)) / det;
+                float b3 = 1 - b1 - b2;
+
+                return b1 * v1.Y + b2 * v2.Y + b3 * v3.Y;
+            }
+            return 0;
+        }
+        float generateHeight(float x, float z) {
+            Cell c = CellAt(x, z);
+            if (c.isLake)
+                return WaterHeight - 5 - 2 * (Noise.Generate(x / 30f, z / 30f) * .5f + .5f);
+
+            return WaterHeight + 2 + 2 * Noise.Generate(x / 60f, z / 60f);
         }
         
         void DrawInstanced(GraphicsDevice device, Model model, ref DynamicVertexBuffer vbuffer, Matrix[] transforms) {
@@ -135,11 +202,11 @@ namespace Procedural_Story.World {
                     device.SetVertexBuffers(new VertexBufferBinding(mmp.VertexBuffer, mmp.VertexOffset, 0), new VertexBufferBinding(vbuffer, 0, 1));
                     device.Indices = mmp.IndexBuffer;
 
-                    Models.SceneEffect.Parameters["World"].SetValue(transf[m.ParentBone.Index]);
-                    Models.SceneEffect.Parameters["Textured"].SetValue(false);
-                    Models.SceneEffect.Parameters["MaterialColor"].SetValue((Vector4)mmp.Tag);
-                    Models.SceneEffect.CurrentTechnique = Models.SceneEffect.Techniques["Instanced"];
-                    foreach (EffectPass p in Models.SceneEffect.CurrentTechnique.Passes) {
+                    Models.WorldEffect.Parameters["World"].SetValue(transf[m.ParentBone.Index]);
+                    Models.WorldEffect.Parameters["Textured"].SetValue(false);
+                    Models.WorldEffect.Parameters["MaterialColor"].SetValue((Vector4)mmp.Tag);
+                    Models.WorldEffect.CurrentTechnique = Models.WorldEffect.Techniques["Instanced"];
+                    foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
                         p.Apply();
                         device.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, mmp.NumVertices, mmp.StartIndex, mmp.PrimitiveCount, transforms.Length);
                     }
@@ -165,48 +232,57 @@ namespace Procedural_Story.World {
             if (jDrawer == null)
                 jDrawer = new JitterDrawer(device);
 
-            Models.SceneEffect.Parameters["ViewProj"].SetValue(Camera.CurrentCamera.View * Camera.CurrentCamera.Projection);
-            Models.SceneEffect.Parameters["DepthDraw"].SetValue(depth);
-            Models.SceneEffect.Parameters["LightDirection"].SetValue(LightDirection);
-            Models.SceneEffect.Parameters["LightWVP"].SetValue(getLightProjection(Camera.CurrentCamera.Position));
-            Models.SceneEffect.Parameters["SunPos"].SetValue(Camera.CurrentCamera.Position - LightDirection * LightPlaneDistance);
+            Models.WorldEffect.Parameters["ViewProj"].SetValue(Camera.CurrentCamera.View * Camera.CurrentCamera.Projection);
+            Models.WorldEffect.Parameters["DepthDraw"].SetValue(depth);
+            Models.WorldEffect.Parameters["LightDirection"].SetValue(LightDirection);
+            Models.WorldEffect.Parameters["LightWVP"].SetValue(getLightProjection(Camera.CurrentCamera.Position));
+            Models.WorldEffect.Parameters["SunPos"].SetValue(Camera.CurrentCamera.Position - LightDirection * LightPlaneDistance);
 
             List<Matrix>[] grassTransforms = new List<Matrix>[Models.GrassModels.Length];
             List<Matrix>[] treeTransforms = new List<Matrix>[Models.TreeModels.Length];
             for (int i = 0; i < grassTransforms.Length; i++) grassTransforms[i] = new List<Matrix>();
             for (int i = 0; i < treeTransforms.Length; i++) treeTransforms[i] = new List<Matrix>();
 
-            #region draw ground
+            #region draw terrain
+            Models.WorldEffect.Parameters["MaterialColor"].SetValue(Vector4.One);
+            Models.WorldEffect.CurrentTechnique = Models.WorldEffect.Techniques["VBO"];
+            Models.WorldEffect.Parameters["World"].SetValue(Matrix.Identity);
 
-            Models.SceneEffect.Parameters["MaterialColor"].SetValue(Vector4.One);
-            Models.SceneEffect.CurrentTechnique = Models.SceneEffect.Techniques["VBO"];
-            for (int i = 0; i < VoronoiCells.Length; i++) {
-                Region r = VoronoiCells[i];
-                if (Camera.CurrentCamera.Frustum.Intersects(new BoundingBox(r.Min, r.Max))){
-                    Matrix W = Matrix.CreateTranslation(r.Point);
-                    Models.SceneEffect.Parameters["World"].SetValue(W);
+            int c = 0;
+            BoundingFrustum f = Camera.CurrentCamera.Frustum;
+            for (int x = 0; x < Width; x++) {
+                for (int z = 0; z < Height; z++) {
+                    if (f.Intersects(Chunks[x, z].bBox)) {
+                        c++;
 
-                    device.SetVertexBuffer(r.VertexBuffer);
-                    device.Indices = r.IndexBuffer;
+                        device.SetVertexBuffer(Chunks[x, z].VertexBuffer);
+                        device.Indices = Chunks[x, z].IndexBuffer;
+                        foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
+                            p.Apply();
+                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, Chunks[x, z].VertexBuffer.VertexCount, 0, Chunks[x, z].IndexBuffer.IndexCount / 3);
+                        }
 
-                    foreach (EffectPass p in Models.SceneEffect.CurrentTechnique.Passes) {
-                        p.Apply();
-                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, r.VertexBuffer.VertexCount, 0, r.IndexBuffer.IndexCount / 3);
+                        if (Vector3.DistanceSquared(new Vector3((x + .5f) * Chunk.ChunkSize, 0, (z + .5f) * Chunk.ChunkSize), new Vector3(Camera.CurrentCamera.Position.X, 0, Camera.CurrentCamera.Position.Z)) < GrassDrawDistance*GrassDrawDistance)
+                            for (int j = 0; j < Chunks[x, z].Grass.Length; j++)
+                                grassTransforms[j].AddRange(Chunks[x, z].Grass[j]);
+
+                        for (int j = 0; j < Chunks[x, z].Trees.Length; j++)
+                            treeTransforms[j].AddRange(Chunks[x, z].Trees[j]);
                     }
-
-                    for (int j = 0; j < r.Grass.Length; j++)
-                        grassTransforms[j].AddRange(r.Grass[j]);
-                    for (int j = 0; j < r.Trees.Length; j++)
-                        treeTransforms[j].AddRange(r.Trees[j]);
                 }
             }
-            #endregion
-            
-            foreach (wObject o in WorldObjects)
-                o.Draw(device);
-            foreach (Home h in HouseHolds)
-                h.Draw(device);
 
+            if (!depth) {
+                device.SetVertexBuffer(WaterVertexBuffer);
+                device.Indices = WaterIndexBuffer;
+                Models.WorldEffect.CurrentTechnique = Models.WorldEffect.Techniques["Water"];
+                device.BlendState = BlendState.AlphaBlend;
+                foreach (EffectPass p in Models.WorldEffect.CurrentTechnique.Passes) {
+                    p.Apply();
+                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, WaterVertexBuffer.VertexCount, 0, WaterIndexBuffer.IndexCount / 3);
+                }
+                device.BlendState = BlendState.Opaque;
+            }
             #region draw foiliage
             for (int i = 0; i < grassTransforms.Length; i++)
                 if (grassTransforms[i].Count > 0)
@@ -215,12 +291,19 @@ namespace Procedural_Story.World {
                 if (treeTransforms[i].Count > 0)
                     DrawInstanced(device, Models.TreeModels[i], ref TreeVertexBuffer, treeTransforms[i].ToArray());
             #endregion
+            #endregion
+
+            foreach (wObject o in WorldObjects)
+                o.Draw(device);
+            foreach (Home h in HouseHolds)
+                h.Draw(device);
         }
 
         public void Generate(GraphicsDevice device) {
             rand = new Random(Seed);
-            Width = 600;
-            Height = 600;
+            Width = 20;
+            Height = 20;
+            Chunks = new Chunk[Width, Height];
 
             switch (Biome) {
                 case Biome.Forest:
@@ -229,6 +312,13 @@ namespace Procedural_Story.World {
             }
         }
         
+        void smoothHeights() {
+            for (int x = 1; x < RealWidth; x++) {
+                for (int z = 1; z < RealHeight; z++) {
+                    heightMap[x, z] = (heightMap[x, z] + heightMap[x - 1, z] + heightMap[x, z - 1] + heightMap[x + 1, z] + heightMap[x, z + 1]) * .2f;
+                }
+            }
+        }
         /// <summary>
         /// For determining order of verticies in a polygon
         /// </summary>
@@ -263,22 +353,21 @@ namespace Procedural_Story.World {
         void genVoronoi() {
 
             // Thanks Ben
-            BenTools.Mathematics.Vector[] pts = new BenTools.Mathematics.Vector[Width / 2];
+            BenTools.Mathematics.Vector[] pts = new BenTools.Mathematics.Vector[RealWidth / 3];
             for (int i = 0; i < pts.Length; i++)
-                pts[i] = new BenTools.Mathematics.Vector(rand.Next(-Width / 2, Width / 2), rand.Next(-Height / 2, Height / 2));
+                pts[i] = new BenTools.Mathematics.Vector(rand.Next(0, RealWidth), rand.Next(0, RealHeight));
             voronoiGraph = BenTools.Mathematics.Fortune.ComputeVoronoiGraph(pts);
 
             BenTools.Mathematics.Vector[] verts = voronoiGraph.Vertizes.ToArray();
             BenTools.Mathematics.VoronoiEdge[] edges = voronoiGraph.Edges.ToArray();
 
             // compute cells from verticies
-            List<Region> rg = new List<Region>();
+            List<Cell> rg = new List<Cell>();
             for (int i = 0; i < pts.Length; i++) {
-                rg.Add(
-                    new Region(
-                        new Vector3((float)pts[i][0],
-                        (Noise.Generate((float)pts[i][0] / 600f + Width, (float)pts[i][1] / 600f + Height) + 1) * 20,
-                        (float)pts[i][1])));
+                bool lake = rand.Next(0, 30) == 0;
+                Cell r = new Cell(new Vector3((float)pts[i][0], 0, (float)pts[i][1]));
+                r.isLake = lake;
+                rg.Add(r);
             }
 
             for (int i = 0; i < verts.Length; i++) {
@@ -299,14 +388,14 @@ namespace Procedural_Story.World {
                     Vector2 p2 = new Vector2((float)pts[j][0], (float)pts[j][1]);
                     float d = Vector2.DistanceSquared(p, p2);
                     if (d <= least + 1f) // add some slop
-                        rg[j].Verticies.Add(new Vector3(p.X, rg[j].Elevation, p.Y));
+                        rg[j].Verticies.Add(new Vector3(p.X, 0, p.Y));
                 }
             }
 
             // make all the cells' verticies counter-clockwise
             for (int i = 0; i < rg.Count; i++) {
                 LoadProgress = .99f * i / rg.Count; // don't wanna hit 1
-                Region c = rg[i];
+                Cell c = rg[i];
                 c.Center = Vector3.Zero;
                 foreach (Vector3 p in c.Verticies)
                     c.Center += p;
@@ -335,9 +424,9 @@ namespace Procedural_Story.World {
                 }
             }
 
-            BoundingBox areaBox = new BoundingBox(new Vector3(-Width * .5f, 0, -Height * .5f), new Vector3(Width * .5f, 500, Height * .5f));
+            BoundingBox areaBox = new BoundingBox(new Vector3(-RealWidth * .5f, 0, -RealHeight * .5f), new Vector3(RealWidth * .5f, 500, RealHeight * .5f));
             // clamp verticies to be in the bounds of the map
-            foreach (Region cell in rg) {
+            foreach (Cell cell in rg) {
                 for (int i = 0; i < cell.Verticies.Count; i++) {
                     if (!Contains(cell.Verticies[i])) {
                         Vector3 a = cell.Verticies[i];
@@ -388,8 +477,8 @@ namespace Procedural_Story.World {
 
             // calculate min/max
             for (int i = 0; i < VoronoiCells.Length; i++) {
-                VoronoiCells[i].Max = new Vector3(0, VoronoiCells[i].Elevation, 0);
-                VoronoiCells[i].Min = new Vector3(float.MaxValue, 0, float.MaxValue);
+                VoronoiCells[i].Max = new Vector3(0, 0, 0);
+                VoronoiCells[i].Min = new Vector3(float.MaxValue, 100, float.MaxValue);
                 for (int j = 0; j < VoronoiCells[i].Verticies.Count; j++) {
                     if (VoronoiCells[i].Verticies[j].X > VoronoiCells[i].Max.X)
                         VoronoiCells[i].Max.X = VoronoiCells[i].Verticies[j].X;
@@ -404,155 +493,207 @@ namespace Procedural_Story.World {
             }
 
         }
-
         void genForest(object state = null) {
             GraphicsDevice device = (GraphicsDevice)state;
             LoadMessage = "Generating cells...";
             genVoronoi();
+            
+            LoadProgress = 0;
+            
+            #region generate heightmap
+            LoadMessage = "Generating heightmap...";
+            heightMap = new float[RealWidth + 1, RealHeight + 1];
+            heightMapScale = 1;
+            float li = 0;
+            for (int x = 0; x < RealWidth + 1; x++)
+                for (int z = 0; z < RealHeight + 1; z++) {
+                    heightMap[x, z] = generateHeight(x * heightMapScale, z * heightMapScale);
 
-            #region Generate cell geometry and foiliage
+                    li++;
+                    LoadProgress = li / (RealWidth * RealHeight);
+                }
+            for (int i = 0; i < 3; i++)
+                smoothHeights();
+            #endregion
+
+            #region generate chunks
             LoadMessage = "Generating world geometry...";
             LoadProgress = 0;
-            for (int ri = 0; ri < VoronoiCells.Length; ri++) {
-                Region cell = VoronoiCells[ri];
-                List<VertexPositionColorNormal> verts = new List<VertexPositionColorNormal>();
-                List<int> inds = new List<int>();
+            li = 0;
+            for (int cx = 0; cx < Width; cx++) {
+                for (int cz = 0; cz < Height; cz++) {
+                    int crx = cx * Chunk.ChunkSize;
+                    int crz = cz * Chunk.ChunkSize;
 
-                cell.SurfaceArea = 0;
-                cell.GrassDensity = (float)rand.NextDouble();
-                cell.TreeDensity = (float)rand.NextDouble();
+                    #region chunk geometry
+                    List<VertexPositionColorNormal> verts = new List<VertexPositionColorNormal>();
+                    List<int> inds = new List<int>();
+                    // verticies
+                    for (int x = 0; x < Chunk.ChunkSize + 1; x++) {
+                        for (int z = 0; z < Chunk.ChunkSize + 1; z++) {
+                            Vector3 v1 = new Vector3(crx + x * heightMapScale, heightMap[crx + x, crz + z], crz + z * heightMapScale);
+                            Color c = new Color(.2f, .4f, .3f);
+                            if (v1.Y < WaterHeight - 2)
+                                c = new Color(0xFF, 0xEB, 0xCD);
 
-                #region generate geometry
-                Color col = new Color(0.30f, 0.43f + .15f * cell.GrassDensity, 0.43f);
-                int basei = verts.Count;
-                // Add verticies for the cell's geometry
-                for (int i = 0; i < cell.Verticies.Count; i++) {
-                    Vector3 p = cell.Verticies[i] - cell.Point;
-                    verts.Add(new VertexPositionColorNormal(p, col, Vector3.Up)); // top
-                }
-                for (int i = 1; i < cell.Verticies.Count - 1; i++) {
-                    // Add a triangle for the surface
-                    int i2 = i + 1;
-                    inds.Add(basei);
-                    inds.Add(basei + i);
-                    inds.Add(basei + i2);
+                            Vector3 left = Vector3.Zero, right = Vector3.Zero, forward = Vector3.Zero, backward = Vector3.Zero;
+                            if (crx + x > 0)
+                                left = new Vector3(crx + (x - 1) * heightMapScale, heightMap[crx + x - 1, crz + z], crz + z * heightMapScale) - v1;
+                            if (crx + x < RealWidth - 1)
+                                right = new Vector3(crx + (x + 1) * heightMapScale, heightMap[crx + x + 1, crz + z], crz + z * heightMapScale) - v1;
+                            if (crz + z > 0)
+                                forward = new Vector3(crx + x * heightMapScale, heightMap[crx + x, crz + z - 1], crz + (z - 1) * heightMapScale) - v1;
+                            if (crz + z < RealHeight - 1)
+                                backward = new Vector3(crx + x * heightMapScale, heightMap[crx + x, crz + z + 1], crz + (z + 1) * heightMapScale) - v1;
 
-                    Vector3 a = cell.Verticies[0];
-                    Vector3 b = cell.Verticies[i];
-                    Vector3 c = cell.Verticies[i2];
-                    cell.SurfaceArea += (a.X * (b.Z - c.Z) + b.X * (c.Z - a.Z) + c.X * (a.Z - b.Z)) * .5f; // surface area of a triangle
-                }
-                for (int i = 0; i < cell.Verticies.Count; i++) {
-                    Vector3 p1 = cell.Verticies[i] - cell.Point;
-                    Vector3 p2 = cell.Verticies[(i + 1) % cell.Verticies.Count] - cell.Point;
-                    Vector3 d = p1 - p2;
-                    d.Normalize();
-                    Vector3 normal = new Vector3(-d.Z, 0, d.X);
-
-                    int b = verts.Count;
-
-                    verts.Add(new VertexPositionColorNormal(p1, Color.Gray, normal));
-                    verts.Add(new VertexPositionColorNormal(p2, Color.Gray, normal));
-                    verts.Add(new VertexPositionColorNormal(new Vector3(p1.X, -cell.Elevation, p1.Z), Color.Gray, normal));
-                    verts.Add(new VertexPositionColorNormal(new Vector3(p2.X, -cell.Elevation, p2.Z), Color.Gray, normal));
-
-                    inds.Add(b);
-                    inds.Add(b + 3);
-                    inds.Add(b + 1);
-                    inds.Add(b);
-                    inds.Add(b + 2);
-                    inds.Add(b + 3);
-                }
-
-                cell.VertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormal), verts.Count, BufferUsage.WriteOnly);
-                cell.VertexBuffer.SetData(verts.ToArray());
-                cell.IndexBuffer = new IndexBuffer(device, typeof(int), inds.Count, BufferUsage.WriteOnly);
-                cell.IndexBuffer.SetData<int>(inds.ToArray());
-                #endregion
-                #region generate rigidbody
-                List<Jitter.LinearMath.JVector> vts = new List<Jitter.LinearMath.JVector>();
-                for (int i = 0; i < verts.Count; i++)
-                    vts.Add(new Jitter.LinearMath.JVector(verts[i].Position.X, verts[i].Position.Y, verts[i].Position.Z));
-                List<TriangleVertexIndices> ind = new List<TriangleVertexIndices>();
-                for (int i = 0; i < inds.Count; i+=3)
-                    ind.Add(new TriangleVertexIndices(inds[i], inds[i + 1], inds[i + 2]));
-
-                Octree o = new Octree(vts, ind);
-                o.BuildOctree();
-                TriangleMeshShape s = new TriangleMeshShape(o);
-                cell.RigidBody = new RigidBody(s);
-                cell.RigidBody.Position = new Jitter.LinearMath.JVector(cell.Point.X, cell.Point.Y, cell.Point.Z);
-                cell.RigidBody.IsStatic = true;
-                Physics.AddBody(cell.RigidBody);
-                #endregion
-                #region generate foiliage
-                cell.Grass = new List<Matrix>[Models.GrassModels.Length];
-                cell.Trees = new List<Matrix>[Models.TreeModels.Length];
-                for (int i = 0; i < cell.Grass.Length; i++) cell.Grass[i] = new List<Matrix>();
-                for (int i = 0; i < cell.Trees.Length; i++) cell.Trees[i] = new List<Matrix>();
-
-                for (float x = cell.Min.X; x < cell.Max.X; x += 2f / cell.GrassDensity) {
-                    for (float z = cell.Min.Z; z < cell.Max.Z; z += 2f / cell.GrassDensity) {
-                        Vector3 pt = new Vector3(x, cell.Elevation, z) + new Vector3((float)rand.NextDouble() - .5f, 0, (float)rand.NextDouble() - .5f) * 3;
-
-                        if (CellAt(pt) == cell)
-                            cell.Grass[rand.Next(0, cell.Grass.Length)].Add(
-                                Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) *
-                                Matrix.CreateTranslation(pt)
-                                );
-                    }
-                }
-
-                for (float x = cell.Min.X; x < cell.Max.X; x += 5f / cell.TreeDensity) {
-                    for (float z = cell.Min.Z; z < cell.Max.Z; z += 5f / cell.TreeDensity) {
-                        Vector3 pt = new Vector3(x, cell.Elevation, z) + new Vector3((float)rand.NextDouble() - .5f, 0, (float)rand.NextDouble() - .5f) * 3;
-
-                        if (CellAt(pt) == cell) {
-                            int c = rand.Next(0, cell.Trees.Length);
-                            Matrix m = Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) * Matrix.CreateTranslation(pt);
-                            cell.Trees[c].Add(m);
-
-                            RigidBody b = new RigidBody(new CylinderShape(7, .8f));
-                            b.Tag = new { c, m };
-                            b.Position = new Jitter.LinearMath.JVector(pt.X, pt.Y + 2.5f, pt.Z);
-                            b.IsStatic = true;
-                            //cell.treeBodies.Add(b);
-                            Physics.AddBody(b);
+                            left.Normalize(); right.Normalize(); forward.Normalize(); backward.Normalize();
+                            Vector3 n =
+                                ((left != Vector3.Zero && forward != Vector3.Zero) ? -Vector3.Cross(left, forward) : Vector3.Zero) +
+                                ((right != Vector3.Zero && forward != Vector3.Zero) ? -Vector3.Cross(forward, right) : Vector3.Zero) +
+                                ((right != Vector3.Zero && backward != Vector3.Zero) ? -Vector3.Cross(right, backward) : Vector3.Zero) +
+                                ((left != Vector3.Zero && backward != Vector3.Zero) ? -Vector3.Cross(backward, left) : Vector3.Zero);
+                            n.Normalize();
+                            verts.Add(new VertexPositionColorNormal(v1, c, n));
                         }
                     }
-                }
-                #endregion
+                    // indicies
+                    int cs = Chunk.ChunkSize+1;
+                    for (int x = 0; x < Chunk.ChunkSize; x++) {
+                        for (int z = 0; z < Chunk.ChunkSize; z++) {
+                            inds.Add(x + z * cs);
+                            inds.Add(x + (z + 1) * cs);
+                            inds.Add((x + 1) + z * cs);
 
-                LoadProgress = ri / (float)VoronoiCells.Length;
+                            inds.Add((x + 1) + z * cs);
+                            inds.Add(x + (z + 1) * cs);
+                            inds.Add((x + 1) + (z + 1) * cs);
+                        }
+                    }
+                    #endregion
+
+                    Chunks[cx, cz] = new Chunk(cx, cz);
+                    Chunks[cx, cz].VertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorNormal), verts.Count, BufferUsage.WriteOnly);
+                    Chunks[cx, cz].VertexBuffer.SetData(verts.ToArray());
+                    Chunks[cx, cz].IndexBuffer = new IndexBuffer(device, typeof(int), inds.Count, BufferUsage.WriteOnly);
+                    Chunks[cx, cz].IndexBuffer.SetData(inds.ToArray());
+                    Chunks[cx, cz].bBox = new BoundingBox(new Vector3(crx, 0, crz), new Vector3(crx + Chunk.ChunkSize, 100, crz + Chunk.ChunkSize));
+
+                    #region chunk foiliage
+                    // grass and trees
+                    Chunks[cx, cz].Grass = new List<Matrix>[Models.GrassModels.Length];
+                    Chunks[cx, cz].Trees = new List<Matrix>[Models.TreeModels.Length];
+                    for (int i = 0; i < Chunks[cx, cz].Grass.Length; i++) Chunks[cx, cz].Grass[i] = new List<Matrix>();
+                    for (int i = 0; i < Chunks[cx, cz].Trees.Length; i++) Chunks[cx, cz].Trees[i] = new List<Matrix>();
+
+                    for (int x = cx * Chunk.ChunkSize; x < (cx + 1) * Chunk.ChunkSize; x+=2) {
+                        for (int z = cz * Chunk.ChunkSize; z < (cz + 1) * Chunk.ChunkSize; z+=2) {
+                            Vector3 pt = new Vector3(x, 0, z) + new Vector3((float)rand.NextDouble() - .5f, 0, (float)rand.NextDouble() - .5f) * 2;
+                            if (Contains(pt) && !CellAt(pt).isLake) {
+                                pt.Y = HeightAt(pt);
+
+                                Chunks[cx, cz].Grass[rand.Next(0, Chunks[cx, cz].Grass.Length)].Add(
+                                    Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) *
+                                    Matrix.CreateTranslation(pt)
+                                    );
+                            }
+                        }
+                    }
+                    
+                    for (int x = cx * Chunk.ChunkSize; x < (cx + 1) * Chunk.ChunkSize; x+=10) {
+                        for (int z = cz * Chunk.ChunkSize; z < (cz + 1) * Chunk.ChunkSize; z+=10) {
+                            Vector3 pt = new Vector3(x, 0, z) + new Vector3((float)rand.NextDouble() - .5f, 0, (float)rand.NextDouble() - .5f) * 10;
+                            if (Contains(pt) && !CellAt(pt).isLake) {
+                                pt.Y = HeightAt(pt);
+
+                                int c = rand.Next(0, Chunks[cx, cz].Trees.Length);
+                                Matrix m = Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi) * Matrix.CreateTranslation(pt);
+                                Chunks[cx, cz].Trees[c].Add(m);
+
+                                RigidBody b = new RigidBody(new CylinderShape(7, .8f));
+                                b.Tag = new { c, m };
+                                b.Position = new Jitter.LinearMath.JVector(pt.X, pt.Y + 2.5f, pt.Z);
+                                b.IsStatic = true;
+                                Physics.AddBody(b);
+                            }
+
+                        }
+                    }
+                    #endregion
+
+                    li++;
+                    LoadProgress = li / (Width * Height);
+                }
             }
             #endregion
 
+            #region water geometry
+            List<VertexPositionTexture> wverts = new List<VertexPositionTexture>();
+            List<int> winds = new List<int>();
+            for (int i = 0; i < VoronoiCells.Length; i++) {
+                if (VoronoiCells[i].isLake) {
+                    int bi = wverts.Count;
+                    Vector3[] vts = new Vector3[VoronoiCells[i].Verticies.Count];
+                    vts[0] = new Vector3(VoronoiCells[i].Verticies[0].X, WaterHeight, VoronoiCells[i].Verticies[0].Z);
+                    vts[1] = new Vector3(VoronoiCells[i].Verticies[1].X, WaterHeight, VoronoiCells[i].Verticies[1].Z);
+
+                    for (int v = 2; v < VoronoiCells[i].Verticies.Count; v++) {
+                        vts[v] = new Vector3(VoronoiCells[i].Verticies[v].X, WaterHeight, VoronoiCells[i].Verticies[v].Z);
+
+                        winds.Add(bi);
+                        winds.Add(bi + v - 1);
+                        winds.Add(bi + v);
+                    }
+
+                    // expand the verticies out a bit
+                    for (int v = 0; v < vts.Length; v++) {
+                        Vector3 dir = vts[v] - VoronoiCells[i].Center;
+                        dir.Normalize();
+                        vts[v] += dir * 5;
+
+                        wverts.Add(new VertexPositionTexture(vts[v], Vector2.Zero));
+                    }
+                }
+            }
+            WaterVertexBuffer = new VertexBuffer(device, typeof(VertexPositionTexture), wverts.Count, BufferUsage.WriteOnly);
+            WaterVertexBuffer.SetData(wverts.ToArray());
+            WaterIndexBuffer = new IndexBuffer(device, typeof(int), winds.Count, BufferUsage.WriteOnly);
+            WaterIndexBuffer.SetData(winds.ToArray());
+            #endregion
+
+            #region generate rigidbody
+            TerrainShape s = new TerrainShape(heightMap, heightMapScale, heightMapScale);
+            TerrainBody = new RigidBody(s);
+            TerrainBody.IsStatic = true;
+            Physics.AddBody(TerrainBody);
+            #endregion
+            
+            #region generate life
             LoadMessage = "Generating houses";
             LoadProgress = 0;
 
-            for (int i = rand.Next(0, 20); i < VoronoiCells.Length;) {
-                Home home = new Home(VoronoiCells[i].Center, this, rand.Next());
-                home.Orientation = Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi);
-                home.GenerateFloorPlan();
-                home.BuildGeometry(device);
-                HouseHolds.Add(home);
+            for (int i = rand.Next(6, 13); i < VoronoiCells.Length;) {
+                if (!VoronoiCells[i].isLake) {
+                    Home home = new Home(new Vector3(VoronoiCells[i].Center.X, HeightAt(VoronoiCells[i].Center), VoronoiCells[i].Center.Z), this, rand.Next());
+                    home.Orientation = Matrix.CreateRotationY((float)rand.NextDouble() * MathHelper.TwoPi);
+                    home.GenerateFloorPlan();
+                    home.BuildGeometry(device);
+                    HouseHolds.Add(home);
 
-                ComplexCharacter c = new ComplexCharacter(this);
-                c.Position = home.Position + new Vector3(0, c.Height, 0);
-                WorldObjects.Add(c);
-                home.Residents.Add(c);
-                Physics.AddBody(c.RigidBody);
+                    ComplexCharacter c = new ComplexCharacter(this);
+                    c.Position = home.Position + new Vector3(0, c.Height, 0);
+                    WorldObjects.Add(c);
+                    home.Residents.Add(c);
+                    Physics.AddBody(c.RigidBody);
+                }
 
-                // get rid of the grass and trees at this cell
-                for (int g = 0; g < VoronoiCells[i].Grass.Length; g++)
-                    VoronoiCells[i].Grass[g].Clear();
-                for (int t = 0; t < VoronoiCells[i].Trees.Length; t++)
-                    VoronoiCells[i].Trees[t].Clear();
+                i += rand.Next(6, 13);
 
-                i += rand.Next(10, 20);
+                LoadProgress = i / (float)VoronoiCells.Length;
             }
+            #endregion
 
-            LoadProgress = 1;
+            LoadProgress = 2;
+            Console.WriteLine("Done generating");
         }
     }
 }
