@@ -4,6 +4,9 @@ float4x4 World;
 float3 LightDirection = float3(-.5, -.5, 0);
 float AmbientBrightness = .5f;
 
+bool CameraInWater;
+float WaterHeight;
+
 bool Textured;
 float4 MaterialColor;
 texture Tex;
@@ -65,22 +68,23 @@ VertexShaderOutput VBOVS(float4 Position : POSITION0, float3 Normal : NORMAL0, f
 {
 	return CommonVS(Position, Normal, Color, 0, World);
 }
-
 VertexShaderOutput WaterVS(float4 Position : POSITION0, float2 UV : TEXCOORD0)
 {
 	return CommonVS(Position, float3(0, 1, 0), float4(0.3, 0.35, .8, 1), UV, World);
 }
-
 VertexShaderOutput ModelVS(float4 Position : POSITION0, float3 Normal : NORMAL0, float2 UV : TEXCOORD0)
 {
     return CommonVS(Position, Normal, 1, UV, World);
 }
-
 VertexShaderOutput InstancedVS(float4 Position : POSITION0, float3 Normal : NORMAL0, float4x4 transform : BLENDWEIGHT)
 {
 	return CommonVS(Position, Normal, 1, 0, mul(World, transpose(transform)));
 }
 
+VertexShaderOutput DebugVS(float4 Position : POSITION0, float4 Color : COLOR0)
+{
+	return CommonVS(Position, float3(0, 1, 0), Color, 0, World);
+}
 float4 DiffusePS(VertexShaderOutput input) : COLOR0
 {
 	if (DepthDraw)
@@ -92,6 +96,9 @@ float4 DiffusePS(VertexShaderOutput input) : COLOR0
 			float4 tc = tex2D(texSamp, input.UV);
 			clip(tc.a - 1);
 		}
+		if (CameraInWater)
+			tc *= float4(0.3, 0.35, .8, 1);
+
 		/*
 		// shadow map shadows
 		float2 coords = (input.depthCoord.xy * float2(1, -1)) / input.depthCoord.w * .5f + float2(.5f, .5f);
@@ -116,6 +123,14 @@ float4 WaterPS(VertexShaderOutput input) : COLOR0
 	}
 }
 
+technique Debug
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 DebugVS();
+		PixelShader = compile ps_3_0 DiffusePS();
+	}
+}
 technique Model
 {
     pass Pass1

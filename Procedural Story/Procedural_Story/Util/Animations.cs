@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-using Procedural_Story.World.Life;
+using Procedural_Story.Core.Life;
 
 namespace Procedural_Story.Util {
     static class Animations {

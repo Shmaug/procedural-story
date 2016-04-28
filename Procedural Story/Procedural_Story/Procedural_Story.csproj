@@ -78,36 +78,50 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dll\Jitter.dll" />
+    <Content Include="dll\Jitter.XML" />
     <Content Include="TODO.txt" />
+    <Compile Include="Core\Life\Desire.cs" />
+    <Compile Include="Core\Structures\Crate.cs" />
+    <Compile Include="UI\CommandLine.cs" />
+    <Compile Include="Core\Items\Inventory.cs" />
     <Compile Include="Debug.cs" />
+    <Compile Include="UI\ImageButton.cs" />
+    <Compile Include="UI\TextBox.cs" />
     <Compile Include="Util\Animations.cs" />
-    <Compile Include="World\Life\Animation.cs" />
-    <Compile Include="World\Life\Character.cs" />
-    <Compile Include="World\Life\ComplexCharacter.cs" />
-    <Compile Include="World\Life\Home.cs" />
+    <Compile Include="Core\Crops\CornCrop.cs" />
+    <Compile Include="Core\Crops\Crop.cs" />
+    <Compile Include="Core\Life\Animation.cs" />
+    <Compile Include="Core\Life\Character.cs" />
+    <Compile Include="Core\Life\ComplexCharacter.cs" />
+    <Compile Include="Core\Structures\Farm.cs" />
+    <Compile Include="Core\Structures\Home.cs" />
+    <Compile Include="Core\Items\Item.cs" />
+    <Compile Include="Core\Structures\Structure.cs" />
     <Compile Include="Util\Models.cs" />
     <Compile Include="Util\Noise.cs" />
     <Compile Include="Util\Util.cs" />
-    <Compile Include="World\wObject.cs" />
-    <Compile Include="World\Life\Player.cs" />
+    <Compile Include="Core\Life\Town.cs" />
+    <Compile Include="Core\PathSystem.cs" />
+    <Compile Include="Core\wObject.cs" />
+    <Compile Include="Core\Life\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="UI\Button.cs" />
+    <Compile Include="UI\TextButton.cs" />
     <Compile Include="UI\ImageLabel.cs" />
     <Compile Include="UI\TextLabel.cs" />
     <Compile Include="UI\Frame.cs" />
     <Compile Include="UI\UIElement.cs" />
-    <Compile Include="World\Area.cs" />
-    <Compile Include="World\Camera.cs" />
-    <Compile Include="World\Voronoi\FortuneVoronoi.cs" />
-    <Compile Include="World\Voronoi\HashSet.cs" />
-    <Compile Include="World\Voronoi\PriorityQueue.cs" />
-    <Compile Include="World\Voronoi\ToolBox.cs" />
-    <Compile Include="World\Voronoi\Vector.cs" />
+    <Compile Include="Core\Area.cs" />
+    <Compile Include="Core\Camera.cs" />
+    <Compile Include="Core\Voronoi\FortuneVoronoi.cs" />
+    <Compile Include="Core\Voronoi\HashSet.cs" />
+    <Compile Include="Core\Voronoi\PriorityQueue.cs" />
+    <Compile Include="Core\Voronoi\ToolBox.cs" />
+    <Compile Include="Core\Voronoi\Vector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dll\Jitter.dll" />
     <Content Include="_game.ico" />
     <Content Include="_thumb.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>

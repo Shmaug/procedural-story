@@ -2,49 +2,102 @@
 <XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
   <Asset Type="Pipeline:BuildItemCollection">
     <Item>
-      <Source>font\Consolas9.spritefont</Source>
-      <Name>font\Consolas9</Name>
-      <Importer>FontDescriptionImporter</Importer>
-      <Processor>FontDescriptionProcessor</Processor>
+      <Source>fx\world.fx</Source>
+      <Name>fx\world</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Consolas9.xnb</Output>
-      <Time>2016-03-16T23:24:07.8172909-07:00</Time>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\fx\world.xnb</Output>
+      <Time>2016-04-15T17:49:05.1595791-07:00</Time>
     </Item>
     <Item>
-      <Source>font\Avenir36.spritefont</Source>
-      <Name>font\Avenir36</Name>
-      <Importer>FontDescriptionImporter</Importer>
-      <Processor>FontDescriptionProcessor</Processor>
+      <Source>model\Tree_01.fbx</Source>
+      <Name>model\Tree_01</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">2.5</Data>
+      </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Avenir36.xnb</Output>
-      <Time>2016-03-16T20:35:00.4771494-07:00</Time>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_01.xnb</Output>
+      <Time>2016-03-26T22:42:27.4808421-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_01_0.xml</Key>
+        <Value>2016-04-01T18:11:44.4936875-07:00</Value>
+      </Dependency>
     </Item>
     <Item>
-      <Source>sprite\ui\cursor.png</Source>
-      <Name>sprite\ui\cursor</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
+      <Source>model\Tree_02.fbx</Source>
+      <Name>model\Tree_02</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">2.5</Data>
+      </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\cursor.xnb</Output>
-      <Time>2016-03-16T20:51:07.7523453-07:00</Time>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_02.xnb</Output>
+      <Time>2016-03-26T22:42:14.1641015-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_02_0.xml</Key>
+        <Value>2016-04-01T18:11:44.6116471-07:00</Value>
+      </Dependency>
     </Item>
     <Item>
-      <Source>sprite\ui\icons.png</Source>
-      <Name>sprite\ui\icons</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
+      <Source>model\Grass_01.fbx</Source>
+      <Name>model\Grass_01</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">2.5</Data>
+      </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\icons.xnb</Output>
-      <Time>2016-03-16T22:49:42.5113979-07:00</Time>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Grass_01.xnb</Output>
+      <Time>2016-03-20T12:31:02.2382463-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Grass_01_0.xml</Key>
+        <Value>2016-04-01T18:11:44.7291633-07:00</Value>
+      </Dependency>
     </Item>
     <Item>
-      <Source>sprite\ui\hud.png</Source>
-      <Name>sprite\ui\hud</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
+      <Source>model\player.fbx</Source>
+      <Name>model\player</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">0.125</Data>
+      </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\ui\hud.xnb</Output>
-      <Time>2016-03-16T22:47:47.6660862-07:00</Time>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\player.xnb</Output>
+      <Time>2016-03-27T14:37:51.3228113-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\player_0.xml</Key>
+        <Value>2016-04-01T18:11:44.8112434-07:00</Value>
+      </Dependency>
+    </Item>
+    <Item>
+      <Source>model\Box.fbx</Source>
+      <Name>model\Box</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Parameters>
+        <Data Key="Scale">0.5</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Box.xnb</Output>
+      <Time>2016-03-31T17:54:20.1991098-07:00</Time>
+      <Dependency>
+        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Box_0.xml</Key>
+        <Value>2016-04-01T18:11:44.8587477-07:00</Value>
+      </Dependency>
+    </Item>
+    <Item>
+      <Source>audio\ui\button.wav</Source>
+      <Name>audio\ui\button</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\audio\ui\button.xnb</Output>
+      <Time>2016-04-01T17:43:42.4757045-07:00</Time>
     </Item>
     <Item>
       <Source>model\Tree_01.fbx</Source>
@@ -75,97 +128,83 @@
       <Time>2016-03-27T14:37:51.3228113-07:00</Time>
     </Item>
     <Item>
-      <Source>model\player.fbx</Source>
-      <Name>model\player</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">0.125</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\player.xnb</Output>
-      <Time>2016-03-27T14:37:51.3228113-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\player_0.xml</Key>
-        <Value>2016-03-27T14:38:28.1510194-07:00</Value>
-      </Dependency>
-    </Item>
-    <Item>
-      <Source>model\Box.fbx</Source>
-      <Name>model\Box</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Box.xnb</Output>
-      <Time>2016-03-23T12:30:26.7577438-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Box_0.xml</Key>
-        <Value>2016-03-23T12:31:30.5390675-07:00</Value>
-      </Dependency>
-    </Item>
-    <Item>
       <Source>model\Box.fbx</Source>
       <Importer>FbxImporter</Importer>
       <Options>IntermediateFile, DontCacheImportedData</Options>
       <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Box_0.xml</Output>
-      <Time>2016-03-23T12:30:26.7577438-07:00</Time>
+      <Time>2016-03-31T17:54:20.1991098-07:00</Time>
     </Item>
     <Item>
-      <Source>model\Grass_01.fbx</Source>
-      <Name>model\Grass_01</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">2.5</Data>
-      </Parameters>
+      <Source>sprite\icon\cursor.png</Source>
+      <Name>sprite\icon\cursor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Grass_01.xnb</Output>
-      <Time>2016-03-20T12:31:02.2382463-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Grass_01_0.xml</Key>
-        <Value>2016-03-21T21:03:03.0958206-07:00</Value>
-      </Dependency>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\icon\cursor.xnb</Output>
+      <Time>2016-03-16T20:51:07.7523453-07:00</Time>
     </Item>
     <Item>
-      <Source>model\Tree_01.fbx</Source>
-      <Name>model\Tree_01</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">2.5</Data>
-      </Parameters>
+      <Source>sprite\icon\hud.png</Source>
+      <Name>sprite\icon\hud</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_01.xnb</Output>
-      <Time>2016-03-26T22:42:27.4808421-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_01_0.xml</Key>
-        <Value>2016-03-26T22:42:42.5691411-07:00</Value>
-      </Dependency>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\icon\hud.xnb</Output>
+      <Time>2016-03-16T22:47:47.6660862-07:00</Time>
     </Item>
     <Item>
-      <Source>model\Tree_02.fbx</Source>
-      <Name>model\Tree_02</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-      <Parameters>
-        <Data Key="Scale">2.5</Data>
-      </Parameters>
+      <Source>sprite\icon\items\potions.png</Source>
+      <Name>sprite\icon\items\potions</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\model\Tree_02.xnb</Output>
-      <Time>2016-03-26T22:42:14.1641015-07:00</Time>
-      <Dependency>
-        <Key>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\obj\x86\Debug\model\Tree_02_0.xml</Key>
-        <Value>2016-03-26T22:42:42.7122463-07:00</Value>
-      </Dependency>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\icon\items\potions.xnb</Output>
+      <Time>2016-04-27T16:15:10.1247666-07:00</Time>
     </Item>
     <Item>
-      <Source>fx\world.fx</Source>
-      <Name>fx\world</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
+      <Source>sprite\icon\items\crops.png</Source>
+      <Name>sprite\icon\items\crops</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\fx\world.xnb</Output>
-      <Time>2016-03-28T21:56:09.1837446-07:00</Time>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\sprite\icon\items\crops.xnb</Output>
+      <Time>2016-04-27T16:29:01.6454366-07:00</Time>
+    </Item>
+    <Item>
+      <Source>font\Consolas14.bmp</Source>
+      <Name>font\Consolas14</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>FontTextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Consolas14.xnb</Output>
+      <Time>2016-04-27T18:19:00.8360713-07:00</Time>
+    </Item>
+    <Item>
+      <Source>font\Avenir16.bmp</Source>
+      <Name>font\Avenir16</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>FontTextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Avenir16.xnb</Output>
+      <Time>2016-04-27T18:19:00.8380743-07:00</Time>
+    </Item>
+    <Item>
+      <Source>font\Avenir36.bmp</Source>
+      <Name>font\Avenir36</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>FontTextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Avenir36.xnb</Output>
+      <Time>2016-04-27T18:19:00.8400728-07:00</Time>
+    </Item>
+    <Item>
+      <Source>font\Consolas9.bmp</Source>
+      <Name>font\Consolas9</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>FontTextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\trevo\documents\visual studio 2015\Projects\Procedural Story\Procedural Story\Procedural_Story\bin\x86\Debug\Content\font\Consolas9.xnb</Output>
+      <Time>2016-04-27T18:19:00.8340722-07:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

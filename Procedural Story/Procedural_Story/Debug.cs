@@ -1,47 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Procedural_Story.UI;
 
 namespace Procedural_Story {
-    class Debug {
+    static class Debug {
+        public static bool DrawWireFrame;
+        public static bool DrawSettlements = true;
+        public static bool DrawTerrain = true;
+        public static bool DrawPaths;
+
         static List<string> logs = new List<string>();
-        static Dictionary<int, string> labels = new Dictionary<int, string>();
-
-        static Dictionary<int, Tuple<BoundingBox, Color, float>> boxes = new Dictionary<int, Tuple<BoundingBox, Color, float>>();
-
-        static int f1 = 0;
-
+        static Dictionary<string, string> labels = new Dictionary<string, string>();
+        
         public static void Log(object l) {
             logs.Add(l.ToString());
             if (logs.Count > 10)
-                logs.Remove(logs[0]);
-            f1 = 200;
+                logs.RemoveAt(0);
         }
 
-        public static void Track(object l, int slot) {
-            labels[slot] = l != null ? l.ToString() : "null";
+        public static void Track(object l, string name) {
+            labels[name] = l?.ToString() ?? "null";
+        }
+
+        public static void Update() {
+            if (Input.KeyPressed(Keys.D1) && !Input.KeysBlocked)
+                DrawTerrain = !DrawTerrain;
+            if (Input.KeyPressed(Keys.D2) && !Input.KeysBlocked)
+                DrawSettlements = !DrawSettlements;
+            if (Input.KeyPressed(Keys.D3) && !Input.KeysBlocked)
+                DrawPaths = !DrawPaths;
+            if (Input.KeyPressed(Keys.D0) && !Input.KeysBlocked)
+                DrawWireFrame = !DrawWireFrame;
         }
         
-        public static void DrawText(SpriteBatch batch, SpriteFont font) {
-            string str = "";
-            foreach (string l in logs)
-                str += l + "\n";
+        public static void Draw(SpriteBatch batch, SpriteFont font) {
+            int h = (int)font.MeasureString("|").Y;
+            int y = 10;
+            for (int i = 0; i < logs.Count; i++) {
+                string s = logs[i].ToString();
+                batch.Draw(UIElement.BlankTexture, new Rectangle(7, y - 3, (int)font.MeasureString(s).X + 6, h + 3), Color.Black * .75f);
+                batch.DrawString(font, s, new Vector2(10, y), Color.White);
 
-            batch.Draw(UI.UIElement.BlankTexture, new Rectangle(6, 6, 300, 160), Color.Black * .75f * MathHelper.Clamp(f1 / 10f, 0, 1));
-            f1--;
-            if (f1 < 0) f1 = 0;
-            batch.DrawString(font, str, Vector2.One * 10, Color.White);
+                y += h + 5;
+            }
 
-            string str2 = "";
-            foreach (KeyValuePair<int, string> l in labels)
-                str2 += l.Value + "\n";
-            batch.Draw(UI.UIElement.BlankTexture, new Rectangle(506, 6, (int)font.MeasureString(str2).X + 6, (int)font.MeasureString(str2).Y), Color.Black * .5f);
-            batch.DrawString(font, str2, Vector2.One * 10 + Vector2.UnitX * 500, Color.White);
+            y = 10;
+            foreach (KeyValuePair<string, string> l in labels) {
+                batch.Draw(UIElement.BlankTexture, new Rectangle(UIElement.ScreenWidth / 2 - 3, y - 3, (int)font.MeasureString(l.Value).X + 6, h + 3), Color.Black * .75f);
+                batch.DrawString(font, l.Value, new Vector2(UIElement.ScreenWidth * .5f, y), Color.White);
 
-            labels = new Dictionary<int, string>();
+                y += h + 5;
+            }
         }
     }
 }

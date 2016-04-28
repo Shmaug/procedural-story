@@ -1,17 +1,14 @@
 ﻿WORLD GENERATION
-    -Towns
-    -Farms
     -Dungeons/caves/stuff to explore
 
 COMPLEX CHARACTERS
     -Dialog
-    -Daily routine
-        -Based on basic desires (food/water/shelter)
     -Desires
         -Actions from desires
-    -Social network
+    -Social network?
 
 MECHANICS
-    -Inventory
     -Crafting
     -Way to travel between Areas
+
+-Water graphics

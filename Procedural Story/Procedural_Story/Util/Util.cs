@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+
+using Procedural_Story.Core;
 
 namespace Procedural_Story.Util {
     class Util {
@@ -96,6 +95,70 @@ namespace Procedural_Story.Util {
 
             for (int i = 0; i < inds.Length; i++)
                 inds[i] += indexOffset;
+        }
+
+        public static T[] MakeArray<T>(T obj, int length) {
+            T[] array = new T[length];
+            for (int i = 0; i < length; i++)
+                array[i] = obj;
+            return array;
+        }
+
+        /// <summary>
+        /// Takes in a mesh that contains verticies in lists, indexes and optimizes them
+        /// </summary>
+        /// <param name="inVerts"></param>
+        /// <param name="inTris"></param>
+        /// <param name="verts"></param>
+        /// <param name="tris"></param>
+        public static void OptimizeMesh(IList<VertexPositionColorNormal> inVerts, out List<VertexPositionColorNormal> verts, out List<int> tris) {
+            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
+            verts = new List<VertexPositionColorNormal>();
+            tris = new List<int>();
+            
+            #region duplicate vertex removal
+            float minNormDiff = .01f * .01f;
+            for (int i = 0; i < inVerts.Count; i++) {
+                bool add = true;
+                for (int j = 0; j < verts.Count; j++) {
+                    if (inVerts[i].Position == verts[j].Position &&
+                        Vector3.DistanceSquared(inVerts[i].Normal, verts[j].Normal) < minNormDiff &&
+                        inVerts[i].Color == verts[j].Color) {
+                        // This vertex already added, index it and move on
+                        tris.Add(j);
+                        add = false;
+                        break;
+                    }
+                }
+                if (!add)
+                    continue;
+                
+                // This vertex not added yet, add this vertex and index it
+                tris.Add(verts.Count);
+                verts.Add(inVerts[i]);
+            }
+            #endregion
+            
+            #region degenerate triangle removal
+            /*
+            float minArea = .25f * .25f;
+            for (int i = 0; i < tris.Count; i += 3) {
+                VertexPositionColorNormal v1 = verts[tris[i]], v2 = verts[tris[i + 1]], v3 = verts[tris[i + 2]];
+                if (Vector3.Cross(v2.Position - v1.Position, v3.Position - v1.Position).LengthSquared() / 4f < minArea) {
+                    tris.RemoveAt(i);
+                    tris.RemoveAt(i);
+                    tris.RemoveAt(i);
+                    
+                    i -= 3;
+                }
+            }*/
+            #endregion
+            
+
+            watch.Stop();
+            Debug.Log("Optimized " + inVerts.Count + " to " + verts.Count + " in " + watch.ElapsedMilliseconds + "ms");
         }
     }
 }
